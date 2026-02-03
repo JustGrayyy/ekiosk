@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import KioskButton from "../KioskButton";
 
@@ -8,23 +8,39 @@ interface CountingScreenProps {
 
 const CountingScreen = ({ onDone }: CountingScreenProps) => {
   const [count, setCount] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-focus the hidden input on mount
   useEffect(() => {
-    // Simulate counting deposits
-    const targetCount = 5;
-    const interval = setInterval(() => {
-      setCount((prev) => {
-        if (prev >= targetCount) {
-          clearInterval(interval);
-          setIsComplete(true);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 800);
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.focus();
+    }
+  }, []);
 
-    return () => clearInterval(interval);
+  // Re-focus input when clicking anywhere except buttons
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName !== "BUTTON" && hiddenInputRef.current) {
+        hiddenInputRef.current.focus();
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
+  // Handle barcode scanner input (Enter key triggers count)
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const code = hiddenInputRef.current?.value.trim();
+      if (code) {
+        setCount((prev) => prev + 1);
+      }
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = "";
+      }
+    }
   }, []);
 
   return (
@@ -35,13 +51,24 @@ const CountingScreen = ({ onDone }: CountingScreenProps) => {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
+      {/* Hidden input for barcode scanner */}
+      <input
+        ref={hiddenInputRef}
+        type="text"
+        className="absolute opacity-0 -z-10"
+        style={{ position: "absolute", left: "-9999px" }}
+        onKeyDown={handleKeyDown}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+
       <motion.p
         className="text-foreground text-center text-sm md:text-base"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        COUNTING YOUR DEPOSIT...
+        SCAN YOUR ITEMS...
       </motion.p>
 
       <motion.div
@@ -51,7 +78,7 @@ const CountingScreen = ({ onDone }: CountingScreenProps) => {
         transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
       >
         <div className="text-center">
-          <p className="text-foreground text-sm mb-4">COUNT</p>
+          <p className="text-foreground text-sm mb-4">TOTAL ITEMS</p>
           <motion.p
             key={count}
             className="text-primary text-5xl md:text-7xl kiosk-glow"
@@ -66,27 +93,25 @@ const CountingScreen = ({ onDone }: CountingScreenProps) => {
 
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: isComplete ? 1 : 0.3 }}
-        transition={{ duration: 0.3 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <KioskButton 
-          onClick={() => onDone(count)} 
+        <KioskButton
+          onClick={() => onDone(count)}
           size="medium"
-          className={!isComplete ? "pointer-events-none" : "animate-pulse-glow"}
+          className={count > 0 ? "animate-pulse-glow" : ""}
         >
           DONE
         </KioskButton>
       </motion.div>
 
-      {!isComplete && (
-        <motion.p
-          className="text-muted-foreground text-xs"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          PLEASE WAIT...
-        </motion.p>
-      )}
+      <motion.p
+        className="text-muted-foreground text-xs text-center max-w-xs"
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
+        SCANNER READY - SCAN BARCODES TO COUNT
+      </motion.p>
     </motion.div>
   );
 };
