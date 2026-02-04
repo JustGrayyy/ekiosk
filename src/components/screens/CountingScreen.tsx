@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import KioskButton from "../KioskButton";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface CountingScreenProps {
   onDone: (count: number) => void;
+  userLrn: string;
+  userName: string;
 }
 
-const CountingScreen = ({ onDone }: CountingScreenProps) => {
+const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
   const [count, setCount] = useState(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
 
@@ -30,18 +34,60 @@ const CountingScreen = ({ onDone }: CountingScreenProps) => {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Handle barcode scanner input (Enter key triggers count)
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const code = hiddenInputRef.current?.value.trim();
-      if (code) {
-        setCount((prev) => prev + 1);
+  // Sync points to database
+  const syncPointToDatabase = useCallback(async () => {
+    try {
+      // First, try to get existing record
+      const { data: existing } = await supabase
+        .from("student_points")
+        .select("points_balance")
+        .eq("lrn", userLrn)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing record
+        await supabase
+          .from("student_points")
+          .update({ points_balance: existing.points_balance + 1 })
+          .eq("lrn", userLrn);
+      } else {
+        // Insert new record
+        await supabase
+          .from("student_points")
+          .insert({
+            lrn: userLrn,
+            full_name: userName,
+            points_balance: 1,
+          });
       }
-      if (hiddenInputRef.current) {
-        hiddenInputRef.current.value = "";
-      }
+    } catch (err) {
+      console.error("Error syncing point to database:", err);
+      toast({
+        title: "Sync Error",
+        description: "Failed to sync point. Will retry on next scan.",
+        variant: "destructive",
+      });
     }
-  }, []);
+  }, [userLrn, userName]);
+
+  // Handle barcode scanner input (Enter key triggers count)
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        const code = hiddenInputRef.current?.value.trim();
+        if (code) {
+          // Optimistic update: increment local count immediately
+          setCount((prev) => prev + 1);
+          // Sync to database in background
+          syncPointToDatabase();
+        }
+        if (hiddenInputRef.current) {
+          hiddenInputRef.current.value = "";
+        }
+      }
+    },
+    [syncPointToDatabase]
+  );
 
   return (
     <motion.div

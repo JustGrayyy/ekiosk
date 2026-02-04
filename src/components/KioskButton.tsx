@@ -4,28 +4,45 @@ import { ReactNode } from "react";
 interface KioskButtonProps {
   children: ReactNode;
   onClick: () => void;
-  size?: "large" | "medium";
+  size?: "large" | "medium" | "small";
+  variant?: "primary" | "secondary";
+  disabled?: boolean;
   className?: string;
 }
 
-const KioskButton = ({ children, onClick, size = "large", className = "" }: KioskButtonProps) => {
-  const sizeClasses = size === "large" 
-    ? "px-16 py-6 text-xl md:text-2xl min-w-[280px]" 
-    : "px-12 py-4 text-lg md:text-xl min-w-[200px]";
+const KioskButton = ({ 
+  children, 
+  onClick, 
+  size = "large", 
+  variant = "primary",
+  disabled = false,
+  className = "" 
+}: KioskButtonProps) => {
+  const sizeClasses = {
+    large: "px-16 py-6 text-xl md:text-2xl min-w-[280px]",
+    medium: "px-12 py-4 text-lg md:text-xl min-w-[200px]",
+    small: "px-8 py-3 text-sm md:text-base min-w-[120px]",
+  }[size];
+
+  const variantClasses = variant === "primary"
+    ? "bg-primary text-primary-foreground"
+    : "bg-secondary text-secondary-foreground border-2 border-primary/30";
 
   return (
     <motion.button
       onClick={onClick}
+      disabled={disabled}
       className={`
-        bg-primary text-primary-foreground font-bold
+        ${variantClasses} font-bold
         rounded-full kiosk-button-glow
         transition-all duration-200
         active:scale-95
         ${sizeClasses}
+        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
         ${className}
       `}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={disabled ? {} : { scale: 1.05 }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
     >
       {children}
     </motion.button>

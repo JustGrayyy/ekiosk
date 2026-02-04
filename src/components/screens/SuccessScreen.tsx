@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 interface SuccessScreenProps {
   onComplete: () => void;
   depositCount: number;
+  pointsEarned: number;
 }
 
-const SuccessScreen = ({ onComplete, depositCount }: SuccessScreenProps) => {
+const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreenProps) => {
   useEffect(() => {
     // Auto-redirect after 5 seconds
     const timeout = setTimeout(() => {
@@ -60,14 +61,19 @@ const SuccessScreen = ({ onComplete, depositCount }: SuccessScreenProps) => {
           YOUR DEPOSIT WAS<br />SUCCESSFUL
         </motion.p>
 
-        <motion.p
-          className="text-primary-foreground/60 text-xs mt-6"
+        <motion.div
+          className="mt-6 space-y-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
-          ITEMS DEPOSITED: {depositCount}
-        </motion.p>
+          <p className="text-primary-foreground/60 text-xs">
+            ITEMS DEPOSITED: {depositCount}
+          </p>
+          <p className="text-primary-foreground text-sm font-bold">
+            POINTS EARNED: +{pointsEarned}
+          </p>
+        </motion.div>
       </motion.div>
 
       <motion.p

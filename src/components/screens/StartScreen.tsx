@@ -3,9 +3,10 @@ import KioskButton from "../KioskButton";
 
 interface StartScreenProps {
   onStart: () => void;
+  onCheckPoints: () => void;
 }
 
-const StartScreen = ({ onStart }: StartScreenProps) => {
+const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
   return (
     <motion.div
       className="flex flex-col items-center justify-center gap-12"
@@ -23,14 +24,26 @@ const StartScreen = ({ onStart }: StartScreenProps) => {
         TOUCH TO BEGIN YOUR DEPOSIT
       </motion.p>
       
-      <motion.div
-        animate={{ scale: [1, 1.02, 1] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <KioskButton onClick={onStart} className="animate-pulse-glow">
-          START
-        </KioskButton>
-      </motion.div>
+      <div className="flex flex-col gap-6">
+        <motion.div
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <KioskButton onClick={onStart} className="animate-pulse-glow">
+            START
+          </KioskButton>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <KioskButton onClick={onCheckPoints} size="medium" variant="secondary">
+            CHECK POINTS
+          </KioskButton>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };
