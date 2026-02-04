@@ -14,7 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      student_points: {
+        Row: {
+          full_name: string
+          last_updated: string | null
+          lrn: string
+          points_balance: number | null
+        }
+        Insert: {
+          full_name: string
+          last_updated?: string | null
+          lrn: string
+          points_balance?: number | null
+        }
+        Update: {
+          full_name?: string
+          last_updated?: string | null
+          lrn?: string
+          points_balance?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
