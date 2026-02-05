@@ -86,6 +86,7 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
       <input
         ref={hiddenInputRef}
         type="text"
+        inputMode="none"
         className="absolute opacity-0 -z-10"
         style={{ position: "absolute", left: "-9999px" }}
         onKeyDown={handleKeyDown}
