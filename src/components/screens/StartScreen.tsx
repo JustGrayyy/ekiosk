@@ -9,7 +9,7 @@ interface StartScreenProps {
 const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
   return (
     <motion.div
-      className="flex flex-col items-center justify-center gap-12"
+      className="flex flex-col items-center justify-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 px-2"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
