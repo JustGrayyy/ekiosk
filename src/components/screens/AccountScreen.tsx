@@ -32,15 +32,15 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
 
   return (
     <motion.div
-      className="w-full max-w-lg"
+      className="w-full max-w-[95%] sm:max-w-md md:max-w-lg px-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="kiosk-panel rounded-2xl p-8 md:p-10">
+      <div className="kiosk-panel rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10">
         <motion.h2
-          className="text-primary text-center text-lg md:text-xl mb-8 leading-relaxed"
+          className="text-primary text-center text-xs sm:text-sm md:text-base lg:text-xl mb-4 sm:mb-6 md:mb-8 leading-relaxed"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
