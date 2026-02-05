@@ -16,7 +16,7 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
       transition={{ duration: 0.4 }}
     >
       <motion.p 
-        className="text-foreground/70 text-sm md:text-base text-center max-w-md"
+        className="text-foreground/70 text-[10px] sm:text-xs md:text-sm lg:text-base text-center max-w-xs sm:max-w-sm md:max-w-md px-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
