@@ -19,9 +19,9 @@ const KioskButton = ({
   className = "" 
 }: KioskButtonProps) => {
   const sizeClasses = {
-    large: "px-16 py-6 text-xl md:text-2xl min-w-[280px]",
-    medium: "px-12 py-4 text-lg md:text-xl min-w-[200px]",
-    small: "px-8 py-3 text-sm md:text-base min-w-[120px]",
+    large: "px-8 sm:px-12 md:px-16 py-4 sm:py-5 md:py-6 text-sm sm:text-lg md:text-xl lg:text-2xl min-w-[200px] sm:min-w-[240px] md:min-w-[280px] min-h-[52px] sm:min-h-[56px] md:min-h-[64px]",
+    medium: "px-6 sm:px-10 md:px-12 py-3 sm:py-4 text-xs sm:text-base md:text-lg lg:text-xl min-w-[160px] sm:min-w-[180px] md:min-w-[200px] min-h-[48px] sm:min-h-[52px] md:min-h-[56px]",
+    small: "px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm lg:text-base min-w-[100px] sm:min-w-[110px] md:min-w-[120px] min-h-[44px]",
   }[size];
 
   const variantClasses = variant === "primary"

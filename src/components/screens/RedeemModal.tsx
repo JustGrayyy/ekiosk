@@ -88,7 +88,7 @@ const RedeemModal = ({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-3 md:p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -103,7 +103,7 @@ const RedeemModal = ({
 
       {/* Modal */}
       <motion.div
-        className="kiosk-panel relative z-10 w-full max-w-md p-6 md:p-8"
+        className="kiosk-panel relative z-10 w-full max-w-[95%] sm:max-w-sm md:max-w-md p-4 sm:p-5 md:p-6 lg:p-8"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
@@ -116,14 +116,14 @@ const RedeemModal = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <h3 className="text-primary text-xl md:text-2xl text-center mb-2 kiosk-glow">
+              <h3 className="text-primary text-base sm:text-lg md:text-xl lg:text-2xl text-center mb-1 sm:mb-2 kiosk-glow">
                 REDEEM REWARDS
               </h3>
-              <p className="text-foreground/70 text-sm text-center mb-6">
+              <p className="text-foreground/70 text-[10px] sm:text-xs md:text-sm text-center mb-4 sm:mb-5 md:mb-6">
                 YOUR BALANCE: <span className="text-primary">{currentBalance} PTS</span>
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-3 md:space-y-4">
                 {REWARDS.map((reward) => {
                   const canAfford = currentBalance >= reward.cost;
                   return (
@@ -131,7 +131,7 @@ const RedeemModal = ({
                       key={reward.id}
                       onClick={() => handleRedeem(reward)}
                       disabled={!canAfford || loading}
-                      className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${
+                      className={`w-full p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all flex items-center gap-2 sm:gap-3 md:gap-4 min-h-[56px] sm:min-h-[64px] ${
                         canAfford
                           ? "border-primary/50 bg-background/50 hover:border-primary hover:bg-primary/10"
                           : "border-muted/30 bg-muted/10 opacity-50 cursor-not-allowed"
@@ -139,18 +139,18 @@ const RedeemModal = ({
                       whileHover={canAfford ? { scale: 1.02 } : {}}
                       whileTap={canAfford ? { scale: 0.98 } : {}}
                     >
-                      <span className="text-3xl">{reward.icon}</span>
+                      <span className="text-xl sm:text-2xl md:text-3xl">{reward.icon}</span>
                       <div className="flex-1 text-left">
-                        <p className="text-foreground text-sm md:text-base">
+                        <p className="text-foreground text-[10px] sm:text-xs md:text-sm lg:text-base">
                           {reward.name}
                         </p>
-                        <p className={`text-sm ${canAfford ? "text-primary" : "text-muted-foreground"}`}>
+                        <p className={`text-[10px] sm:text-xs md:text-sm ${canAfford ? "text-primary" : "text-muted-foreground"}`}>
                           {reward.cost} PTS
                         </p>
                       </div>
                       {!canAfford && (
-                        <span className="text-xs text-muted-foreground">
-                          NEED {reward.cost - currentBalance} MORE
+                        <span className="text-[8px] sm:text-[10px] md:text-xs text-muted-foreground">
+                          NEED {reward.cost - currentBalance}
                         </span>
                       )}
                     </motion.button>
@@ -158,7 +158,7 @@ const RedeemModal = ({
                 })}
               </div>
 
-              <div className="mt-6 flex justify-center">
+              <div className="mt-4 sm:mt-5 md:mt-6 flex justify-center">
                 <KioskButton onClick={onClose} size="small" variant="secondary">
                   CLOSE
                 </KioskButton>
@@ -172,28 +172,28 @@ const RedeemModal = ({
               animate={{ opacity: 1, scale: 1 }}
             >
               <motion.div
-                className="text-5xl mb-4"
+                className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200 }}
               >
                 🎉
               </motion.div>
-              <h3 className="text-primary text-xl md:text-2xl mb-2 kiosk-glow">
+              <h3 className="text-primary text-base sm:text-lg md:text-xl lg:text-2xl mb-1 sm:mb-2 kiosk-glow">
                 REDEMPTION SUCCESSFUL!
               </h3>
-              <p className="text-foreground/70 text-sm mb-4">
+              <p className="text-foreground/70 text-[10px] sm:text-xs md:text-sm mb-3 sm:mb-4">
                 {redeemedReward?.name}
               </p>
 
-              <div className="bg-background/50 rounded-xl p-4 mb-6">
-                <p className="text-foreground/70 text-xs mb-1">YOUR CLAIM CODE</p>
-                <p className="text-primary text-2xl md:text-3xl font-bold tracking-widest kiosk-glow">
+              <div className="bg-background/50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-5 md:mb-6">
+                <p className="text-foreground/70 text-[8px] sm:text-[10px] md:text-xs mb-1">YOUR CLAIM CODE</p>
+                <p className="text-primary text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-widest kiosk-glow">
                   {claimCode}
                 </p>
               </div>
 
-              <p className="text-muted-foreground text-xs mb-6">
+              <p className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs mb-4 sm:mb-5 md:mb-6">
                 Present this code at the counter to claim your reward
               </p>
 

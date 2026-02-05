@@ -34,32 +34,17 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Sync points to database
+  // Sync points to database using atomic increment
   const syncPointToDatabase = useCallback(async () => {
     try {
-      // First, try to get existing record
-      const { data: existing } = await supabase
-        .from("student_points")
-        .select("points_balance")
-        .eq("lrn", userLrn)
-        .maybeSingle();
+      // Use atomic increment function to prevent race conditions
+      const { error } = await supabase.rpc("increment_points", {
+        student_lrn: userLrn,
+        student_name: userName,
+        points_to_add: 1,
+      });
 
-      if (existing) {
-        // Update existing record
-        await supabase
-          .from("student_points")
-          .update({ points_balance: existing.points_balance + 1 })
-          .eq("lrn", userLrn);
-      } else {
-        // Insert new record
-        await supabase
-          .from("student_points")
-          .insert({
-            lrn: userLrn,
-            full_name: userName,
-            points_balance: 1,
-          });
-      }
+      if (error) throw error;
     } catch (err) {
       console.error("Error syncing point to database:", err);
       toast({
@@ -91,7 +76,7 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
 
   return (
     <motion.div
-      className="flex flex-col items-center gap-8"
+      className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 px-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -109,7 +94,7 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
       />
 
       <motion.p
-        className="text-foreground text-center text-sm md:text-base"
+        className="text-foreground text-center text-[10px] sm:text-xs md:text-sm lg:text-base"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -118,16 +103,16 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
       </motion.p>
 
       <motion.div
-        className="kiosk-display rounded-2xl p-8 md:p-12 min-w-[300px]"
+        className="kiosk-display rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 min-w-[200px] sm:min-w-[260px] md:min-w-[300px]"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
       >
         <div className="text-center">
-          <p className="text-foreground text-sm mb-4">TOTAL ITEMS</p>
+          <p className="text-foreground text-[10px] sm:text-xs md:text-sm mb-2 sm:mb-3 md:mb-4">TOTAL ITEMS</p>
           <motion.p
             key={count}
-            className="text-primary text-5xl md:text-7xl kiosk-glow"
+            className="text-primary text-3xl sm:text-4xl md:text-5xl lg:text-7xl kiosk-glow"
             initial={{ scale: 1.2 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -152,7 +137,7 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
       </motion.div>
 
       <motion.p
-        className="text-muted-foreground text-xs text-center max-w-xs"
+        className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs text-center max-w-[200px] sm:max-w-xs"
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
