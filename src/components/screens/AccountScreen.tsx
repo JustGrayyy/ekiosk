@@ -48,26 +48,26 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
           TYPE IN YOUR<br />ACCOUNT INFORMATION
         </motion.h2>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-foreground text-sm">NAME</label>
+        <div className="space-y-4 sm:space-y-5 md:space-y-6">
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-foreground text-[10px] sm:text-xs md:text-sm">NAME</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full kiosk-input rounded-lg px-4 py-4 text-foreground text-lg outline-none transition-all"
+              className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
               placeholder="Enter your name"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-foreground text-sm">LRN</label>
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-foreground text-[10px] sm:text-xs md:text-sm">LRN</label>
             <input
               type="text"
               inputMode="numeric"
               value={lrn}
               onChange={(e) => handleLrnChange(e.target.value)}
-              className="w-full kiosk-input rounded-lg px-4 py-4 text-foreground text-lg outline-none transition-all"
+              className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
               placeholder="Enter your LRN"
             />
           </div>
