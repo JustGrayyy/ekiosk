@@ -19,14 +19,14 @@ const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreen
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center"
+      className="flex flex-col items-center justify-center px-2"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
     >
       <motion.div
-        className="bg-primary rounded-3xl p-10 md:p-16 text-center shadow-2xl"
+        className="bg-primary rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-16 text-center shadow-2xl"
         initial={{ y: 50 }}
         animate={{ y: 0 }}
         transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
@@ -38,13 +38,13 @@ const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreen
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-          className="mb-6"
+          className="mb-4 sm:mb-5 md:mb-6"
         >
-          <span className="text-6xl md:text-8xl">✓</span>
+          <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl">✓</span>
         </motion.div>
         
         <motion.h2
-          className="text-primary-foreground text-2xl md:text-4xl mb-4"
+          className="text-primary-foreground text-lg sm:text-xl md:text-2xl lg:text-4xl mb-2 sm:mb-3 md:mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -53,7 +53,7 @@ const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreen
         </motion.h2>
         
         <motion.p
-          className="text-primary-foreground/80 text-sm md:text-base"
+          className="text-primary-foreground/80 text-[10px] sm:text-xs md:text-sm lg:text-base"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
@@ -62,22 +62,22 @@ const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreen
         </motion.p>
 
         <motion.div
-          className="mt-6 space-y-2"
+          className="mt-4 sm:mt-5 md:mt-6 space-y-1 sm:space-y-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
-          <p className="text-primary-foreground/60 text-xs">
+          <p className="text-primary-foreground/60 text-[8px] sm:text-[10px] md:text-xs">
             ITEMS DEPOSITED: {depositCount}
           </p>
-          <p className="text-primary-foreground text-sm font-bold">
+          <p className="text-primary-foreground text-[10px] sm:text-xs md:text-sm font-bold">
             POINTS EARNED: +{pointsEarned}
           </p>
         </motion.div>
       </motion.div>
 
       <motion.p
-        className="text-muted-foreground text-xs mt-8"
+        className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs mt-6 sm:mt-7 md:mt-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}

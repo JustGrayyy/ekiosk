@@ -172,28 +172,28 @@ const RedeemModal = ({
               animate={{ opacity: 1, scale: 1 }}
             >
               <motion.div
-                className="text-5xl mb-4"
+                className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200 }}
               >
                 🎉
               </motion.div>
-              <h3 className="text-primary text-xl md:text-2xl mb-2 kiosk-glow">
+              <h3 className="text-primary text-base sm:text-lg md:text-xl lg:text-2xl mb-1 sm:mb-2 kiosk-glow">
                 REDEMPTION SUCCESSFUL!
               </h3>
-              <p className="text-foreground/70 text-sm mb-4">
+              <p className="text-foreground/70 text-[10px] sm:text-xs md:text-sm mb-3 sm:mb-4">
                 {redeemedReward?.name}
               </p>
 
-              <div className="bg-background/50 rounded-xl p-4 mb-6">
-                <p className="text-foreground/70 text-xs mb-1">YOUR CLAIM CODE</p>
-                <p className="text-primary text-2xl md:text-3xl font-bold tracking-widest kiosk-glow">
+              <div className="bg-background/50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-5 md:mb-6">
+                <p className="text-foreground/70 text-[8px] sm:text-[10px] md:text-xs mb-1">YOUR CLAIM CODE</p>
+                <p className="text-primary text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-widest kiosk-glow">
                   {claimCode}
                 </p>
               </div>
 
-              <p className="text-muted-foreground text-xs mb-6">
+              <p className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs mb-4 sm:mb-5 md:mb-6">
                 Present this code at the counter to claim your reward
               </p>
 
