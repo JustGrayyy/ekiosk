@@ -25,12 +25,12 @@ const DepositScreen = ({ onDeposit, userName }: DepositScreenProps) => {
       </motion.p>
 
       <motion.div
-        className="kiosk-panel rounded-2xl p-10 md:p-12"
+        className="kiosk-panel rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
       >
-        <p className="text-foreground text-center text-sm mb-6">
+        <p className="text-foreground text-center text-[10px] sm:text-xs md:text-sm mb-4 sm:mb-5 md:mb-6">
           SELECT YOUR TRANSACTION
         </p>
         
