@@ -30,7 +30,7 @@ const KioskLayout = ({ children, showLogo = true }: KioskLayoutProps) => {
         
         <AnimatePresence mode="wait">
           <motion.div
-            className="flex-1 flex flex-col items-center justify-center w-full max-w-2xl"
+            className="flex-1 flex flex-col items-center justify-center w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-3xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}

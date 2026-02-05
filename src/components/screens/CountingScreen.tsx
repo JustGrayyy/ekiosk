@@ -34,32 +34,17 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Sync points to database
+  // Sync points to database using atomic increment
   const syncPointToDatabase = useCallback(async () => {
     try {
-      // First, try to get existing record
-      const { data: existing } = await supabase
-        .from("student_points")
-        .select("points_balance")
-        .eq("lrn", userLrn)
-        .maybeSingle();
+      // Use atomic increment function to prevent race conditions
+      const { error } = await supabase.rpc("increment_points", {
+        student_lrn: userLrn,
+        student_name: userName,
+        points_to_add: 1,
+      });
 
-      if (existing) {
-        // Update existing record
-        await supabase
-          .from("student_points")
-          .update({ points_balance: existing.points_balance + 1 })
-          .eq("lrn", userLrn);
-      } else {
-        // Insert new record
-        await supabase
-          .from("student_points")
-          .insert({
-            lrn: userLrn,
-            full_name: userName,
-            points_balance: 1,
-          });
-      }
+      if (error) throw error;
     } catch (err) {
       console.error("Error syncing point to database:", err);
       toast({
