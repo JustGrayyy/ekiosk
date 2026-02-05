@@ -74,13 +74,16 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
 
           {error && (
             <motion.p
-              className="text-destructive text-sm text-center"
+              className="text-destructive text-[10px] sm:text-xs md:text-sm text-center"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
               {error}
             </motion.p>
           )}
+        </div>
+
+        <div className="mt-6 sm:mt-7 md:mt-8 flex justify-center">
         </div>
 
         <div className="mt-8 flex justify-center">
