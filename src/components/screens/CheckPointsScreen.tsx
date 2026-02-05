@@ -90,14 +90,14 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
 
   return (
     <motion.div
-      className="flex flex-col items-center gap-8 w-full max-w-md"
+      className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 w-full max-w-[95%] sm:max-w-sm md:max-w-md px-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
       <motion.h2
-        className="text-primary text-xl md:text-2xl text-center kiosk-glow"
+        className="text-primary text-base sm:text-lg md:text-xl lg:text-2xl text-center kiosk-glow"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
@@ -108,12 +108,12 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
       {!studentData ? (
         <>
           <motion.div
-            className="kiosk-panel w-full p-6 md:p-8"
+            className="kiosk-panel w-full p-4 sm:p-5 md:p-6 lg:p-8"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <p className="text-foreground text-sm mb-4 text-center">
+            <p className="text-foreground text-[10px] sm:text-xs md:text-sm mb-3 sm:mb-4 text-center">
               ENTER YOUR LRN
             </p>
             <input
@@ -127,13 +127,13 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
                 setError("");
               }}
               onKeyDown={handleKeyDown}
-              className="w-full bg-background border-2 border-primary/50 rounded-xl p-4 text-center text-xl text-foreground focus:outline-none focus:border-primary transition-colors"
+              className="w-full bg-background border-2 border-primary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center text-base sm:text-lg md:text-xl text-foreground focus:outline-none focus:border-primary transition-colors min-h-[44px]"
               placeholder="000000000000"
               maxLength={12}
             />
             {error && (
               <motion.p
-                className="text-destructive text-sm mt-3 text-center"
+                className="text-destructive text-[10px] sm:text-xs md:text-sm mt-2 sm:mt-3 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
@@ -143,7 +143,7 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
           </motion.div>
 
           <motion.div
-            className="flex gap-4"
+            className="flex gap-2 sm:gap-3 md:gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -152,7 +152,7 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
               BACK
             </KioskButton>
             <KioskButton onClick={handleSearch} size="small" disabled={loading}>
-              {loading ? "SEARCHING..." : "SEARCH"}
+              {loading ? "..." : "SEARCH"}
             </KioskButton>
           </motion.div>
         </>
