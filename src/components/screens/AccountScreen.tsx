@@ -86,11 +86,12 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
         <div className="mt-6 sm:mt-7 md:mt-8 flex justify-center">
         </div>
 
-        <div className="mt-8 flex justify-center">
           <KioskButton onClick={handleSubmit} size="medium">
             ENTER
           </KioskButton>
         </div>
+      </div>
+    </motion.div>
       </div>
     </motion.div>
   );
