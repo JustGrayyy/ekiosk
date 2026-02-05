@@ -9,7 +9,7 @@ interface DepositScreenProps {
 const DepositScreen = ({ onDeposit, userName }: DepositScreenProps) => {
   return (
     <motion.div
-      className="flex flex-col items-center gap-8"
+      className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 px-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
