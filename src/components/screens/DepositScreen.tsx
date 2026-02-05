@@ -16,7 +16,7 @@ const DepositScreen = ({ onDeposit, userName }: DepositScreenProps) => {
       transition={{ duration: 0.4 }}
     >
       <motion.p
-        className="text-foreground text-center text-sm md:text-base"
+        className="text-foreground text-center text-[10px] sm:text-xs md:text-sm lg:text-base"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
