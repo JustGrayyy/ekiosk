@@ -21,9 +21,9 @@ const KioskLayout = ({ children, showLogo = true }: KioskLayoutProps) => {
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
       
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center px-4 py-8 md:py-12">
+      <div className="relative z-10 min-h-screen flex flex-col items-center px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12">
         {showLogo && (
-          <div className="mb-8 md:mb-12">
+          <div className="mb-4 sm:mb-6 md:mb-8 lg:mb-12">
             <KioskLogo />
           </div>
         )}
