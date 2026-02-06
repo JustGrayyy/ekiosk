@@ -1,49 +1,41 @@
 
-# Loyalty Points System & LRN Integration
+
+# Secure Admin Portal and Analytics Dashboard
 
 ## Overview
 
-This plan implements a complete loyalty points tracking ecosystem with Supabase backend integration. Students can check their points balance, redeem rewards, and automatically earn points when depositing items via barcode scanner.
-
-## Architecture
-
-```text
-+-------------------+     +--------------------+     +------------------+
-|   Start Screen    |---->| Account Screen     |---->| Deposit Screen   |
-|   + Check Points  |     | (Name + LRN)       |     |                  |
-+-------------------+     +--------------------+     +------------------+
-         |                                                    |
-         v                                                    v
-+-------------------+                             +------------------+
-| Check Points      |                             | Counting Screen  |
-| Screen (LRN Input)|                             | + DB Point Sync  |
-+-------------------+                             +------------------+
-         |                                                    |
-         v                                                    v
-+-------------------+                             +------------------+
-| Points Display    |                             | Success Screen   |
-| + Redeem Modal    |                             | (Shows Points)   |
-+-------------------+                             +------------------+
-```
+This plan adds a PIN-protected admin dashboard with 6 analytical charts. It requires two new database tables to track scan and redemption history, a backend function for secure PIN validation, and new frontend pages for the login gate and dashboard.
 
 ## What Will Be Built
 
-### 1. Database Setup
-- **Table**: `student_points` with columns for LRN (primary key), full name, points balance, and timestamp
-- **RLS Policies**: Allow public read/write for kiosk use (no authentication required)
+### 1. New Database Tables
+Two logging tables are needed since the current `student_points` table only stores balances, not history:
 
-### 2. New Screens
-- **CheckPointsScreen**: LRN input, student lookup, points display, and redeem button
-- **RedeemModal**: Overlay with dummy rewards and redemption logic
+- **scan_logs**: Records every individual barcode scan with a timestamp (powers Daily Velocity, Peak Hours, and Semester Goal charts)
+- **redemption_logs**: Records every reward redemption (powers Points Economy chart)
 
-### 3. Updated Screens
-- **StartScreen**: Add "CHECK POINTS" button alongside existing "START" button
-- **CountingScreen**: Sync each scanned item to database, incrementing points
-- **SuccessScreen**: Display points earned during session
+### 2. Secure PIN Validation
+- A backend function validates the admin PIN against a stored secret -- no hardcoded credentials in frontend code
+- PIN is stored as a backend secret (you will be prompted to enter it)
+- On success, a session flag allows access to the dashboard
 
-### 4. Navigation Flow Updates
-- Add new screen type "checkPoints" to the screen state machine
-- Pass LRN through the deposit flow for database sync
+### 3. New Pages and Routes
+- **/admin-login**: Clean PIN entry page with error feedback
+- **/admin-dashboard**: Protected page with 6 charts in a responsive grid
+
+### 4. Updated Existing Code
+- **Landing Page**: Small "Admin Access" link in the footer
+- **CountingScreen**: Also inserts a row into `scan_logs` on each scan
+- **RedeemModal**: Also inserts a row into `redemption_logs` on each redemption
+
+### 5. The 6 Dashboard Charts (using Recharts)
+
+1. **Daily Scan Velocity** (Line Chart) -- scans per day, last 7 days
+2. **Top 5 Contributors** (Horizontal Bar) -- top students by points, gold/silver/bronze colors
+3. **Registration Status** (Doughnut) -- active vs inactive students, total count in center
+4. **Points Economy** (Grouped Bar) -- total earned vs total redeemed
+5. **Peak Hours** (Bar Chart) -- scan frequency by hour of day
+6. **Semester Goal** (Progress/Gauge) -- total scans vs configurable target (default 10,000)
 
 ---
 
@@ -52,95 +44,88 @@ This plan implements a complete loyalty points tracking ecosystem with Supabase 
 ### Database Schema
 
 ```sql
-CREATE TABLE public.student_points (
-  lrn TEXT PRIMARY KEY,
-  full_name TEXT NOT NULL,
-  points_balance INTEGER DEFAULT 0,
-  last_updated TIMESTAMP WITH TIME ZONE DEFAULT now()
+-- Scan history for analytics
+CREATE TABLE public.scan_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lrn TEXT NOT NULL,
+  scanned_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Enable RLS
-ALTER TABLE public.student_points ENABLE ROW LEVEL SECURITY;
+-- Redemption history for analytics
+CREATE TABLE public.redemption_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lrn TEXT NOT NULL,
+  reward_name TEXT NOT NULL,
+  points_redeemed INTEGER NOT NULL,
+  redeemed_at TIMESTAMPTZ DEFAULT now()
+);
 
--- Public access policies (kiosk operates without auth)
-CREATE POLICY "Allow public read" ON public.student_points
-  FOR SELECT USING (true);
+-- RLS: public read/insert (kiosk, no auth)
+ALTER TABLE public.scan_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read" ON public.scan_logs FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON public.scan_logs FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Allow public insert" ON public.student_points
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Allow public update" ON public.student_points
-  FOR UPDATE USING (true);
+ALTER TABLE public.redemption_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read" ON public.redemption_logs FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON public.redemption_logs FOR INSERT WITH CHECK (true);
 ```
 
-### File Changes
+### Backend Function: `verify-admin-pin`
 
-**New Files:**
-1. `src/components/screens/CheckPointsScreen.tsx` - LRN lookup and points display
-2. `src/components/screens/RedeemModal.tsx` - Rewards redemption overlay
+An edge function that compares the submitted PIN against the `ADMIN_PIN` secret. Returns `{ valid: true }` or `{ valid: false }`. This keeps the PIN out of frontend code entirely.
 
-**Modified Files:**
-1. `src/pages/Index.tsx` - Add new screen states and navigation handlers
-2. `src/components/screens/StartScreen.tsx` - Add "CHECK POINTS" button
-3. `src/components/screens/CountingScreen.tsx` - Add LRN prop and database sync
-4. `src/components/screens/SuccessScreen.tsx` - Show points earned
-5. `src/integrations/supabase/client.ts` - Supabase client setup
-6. `src/integrations/supabase/types.ts` - TypeScript types for database
+### New Files
 
-### Component Details
+| File | Purpose |
+|------|---------|
+| `supabase/functions/verify-admin-pin/index.ts` | PIN validation edge function |
+| `src/pages/AdminLogin.tsx` | PIN entry page |
+| `src/pages/AdminDashboard.tsx` | Dashboard with 6 charts |
+| `src/components/admin/DailyScanChart.tsx` | Line chart component |
+| `src/components/admin/TopContributorsChart.tsx` | Horizontal bar chart |
+| `src/components/admin/RegistrationStatusChart.tsx` | Doughnut chart |
+| `src/components/admin/PointsEconomyChart.tsx` | Grouped bar chart |
+| `src/components/admin/PeakHoursChart.tsx` | Bar chart |
+| `src/components/admin/SemesterGoalChart.tsx` | Progress/gauge component |
 
-**CheckPointsScreen.tsx**
-- Large centered LRN numeric input
-- "SEARCH" button triggers database query
-- Displays student name and points balance on success
-- Shows "Student not found" error if LRN doesn't exist
-- "REDEEM POINTS" button (disabled if balance is 0)
-- "BACK" button to return to start
+### Modified Files
 
-**RedeemModal.tsx**
-- Modal overlay with "REDEEM REWARDS" title
-- Three dummy rewards:
-  - School Supplies Pack - 50 pts
-  - Canteen Voucher - 100 pts
-  - Premium Item - 200 pts
-- Each reward shows required points
-- Clicking a reward:
-  - Validates sufficient balance
-  - Deducts points from database
-  - Shows success message with claim code
-  - Updates displayed balance in real-time
+| File | Change |
+|------|--------|
+| `src/App.tsx` | Add `/admin-login` and `/admin-dashboard` routes |
+| `src/pages/Index.tsx` | Add discreet "Admin Access" link at bottom |
+| `src/components/screens/CountingScreen.tsx` | Insert into `scan_logs` on each scan |
+| `src/components/screens/RedeemModal.tsx` | Insert into `redemption_logs` on each redemption |
 
-**CountingScreen.tsx Updates**
-- Accept `userLrn` prop from parent
-- On each successful barcode scan:
-  - Increment local count (existing behavior)
-  - Call Supabase to increment `points_balance` by 1
-- Use optimistic updates for instant UI feedback
+### Data Queries for Charts
 
-**SuccessScreen.tsx Updates**
-- Accept `pointsEarned` prop
-- Display "POINTS EARNED: X" alongside deposit count
+1. **Daily Scan Velocity**: `SELECT DATE(scanned_at) as day, COUNT(*) FROM scan_logs WHERE scanned_at > now() - interval '7 days' GROUP BY day ORDER BY day`
+2. **Top 5 Contributors**: `SELECT * FROM student_points ORDER BY points_balance DESC LIMIT 5`
+3. **Registration Status**: `SELECT COUNT(*) FILTER (WHERE points_balance > 0) as active, COUNT(*) FILTER (WHERE points_balance = 0) as inactive FROM student_points`
+4. **Points Economy**: Total earned from `scan_logs` count, total redeemed from `SUM(points_redeemed)` in `redemption_logs`
+5. **Peak Hours**: `SELECT EXTRACT(HOUR FROM scanned_at) as hour, COUNT(*) FROM scan_logs GROUP BY hour ORDER BY hour`
+6. **Semester Goal**: `SELECT COUNT(*) FROM scan_logs` vs hardcoded target
 
-### Styling Approach
-- "CHECK POINTS" button uses existing primary color (amber/gold)
-- Slight visual distinction using secondary styling or icon
-- Modal uses existing `kiosk-panel` styling with overlay backdrop
-- All components maintain the retro arcade aesthetic
+### Security Approach
 
-### Error Handling
-- Network errors show toast notifications
-- Graceful fallback if database is unreachable
-- Input validation for LRN format (numeric only)
+- Admin PIN stored as a backend secret (never in frontend code)
+- Edge function validates PIN server-side
+- `sessionStorage` flag grants access for the current browser tab only (cleared on tab close)
+- Dashboard route checks the flag and redirects to login if missing
 
----
+### Styling
+
+- Dashboard uses a different layout than the kiosk screens -- clean grid with dark cards matching the existing retro green/amber theme
+- Charts use amber/gold primary color with green accents to stay on-brand
+- Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop
 
 ## Implementation Sequence
 
-1. **Supabase Setup**: Enable Lovable Cloud, create database table and RLS policies
-2. **Type Definitions**: Add Supabase client and TypeScript types
-3. **CheckPointsScreen**: Build LRN lookup UI and database query logic
-4. **RedeemModal**: Build rewards display and redemption logic
-5. **StartScreen Update**: Add "CHECK POINTS" button with navigation
-6. **Index.tsx Update**: Add new screen states and handlers
-7. **CountingScreen Update**: Integrate database point sync on each scan
-8. **SuccessScreen Update**: Display points earned
+1. Create `scan_logs` and `redemption_logs` tables (migration)
+2. Add `ADMIN_PIN` secret (user will be prompted)
+3. Create `verify-admin-pin` edge function
+4. Update `CountingScreen` and `RedeemModal` to log events
+5. Build `AdminLogin` page
+6. Build `AdminDashboard` with all 6 chart components
+7. Update `App.tsx` routes and add admin link to landing page
+
