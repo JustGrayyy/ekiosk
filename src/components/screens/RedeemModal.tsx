@@ -65,6 +65,13 @@ const RedeemModal = ({
 
       if (error) throw error;
 
+      // Log redemption for analytics
+      await supabase.from("redemption_logs").insert({
+        lrn: studentLrn,
+        reward_name: reward.name,
+        points_redeemed: reward.cost,
+      });
+
       const code = generateClaimCode();
       setClaimCode(code);
       setRedeemedReward(reward);

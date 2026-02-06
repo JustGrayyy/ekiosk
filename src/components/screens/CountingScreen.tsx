@@ -65,6 +65,10 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
           setCount((prev) => prev + 1);
           // Sync to database in background
           syncPointToDatabase();
+          // Log scan for analytics
+          supabase.from("scan_logs").insert({ lrn: userLrn }).then(({ error }) => {
+            if (error) console.error("Error logging scan:", error);
+          });
         }
         if (hiddenInputRef.current) {
           hiddenInputRef.current.value = "";

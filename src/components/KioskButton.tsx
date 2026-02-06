@@ -3,7 +3,8 @@ import { ReactNode } from "react";
 
 interface KioskButtonProps {
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
   size?: "large" | "medium" | "small";
   variant?: "primary" | "secondary";
   disabled?: boolean;
@@ -13,6 +14,7 @@ interface KioskButtonProps {
 const KioskButton = ({ 
   children, 
   onClick, 
+  type = "button",
   size = "large", 
   variant = "primary",
   disabled = false,
@@ -30,6 +32,7 @@ const KioskButton = ({
 
   return (
     <motion.button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`

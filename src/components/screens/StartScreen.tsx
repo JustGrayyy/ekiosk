@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
 import KioskButton from "../KioskButton";
 
 interface StartScreenProps {
@@ -7,6 +9,8 @@ interface StartScreenProps {
 }
 
 const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       className="flex flex-col items-center justify-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 px-2"
@@ -44,6 +48,17 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
           </KioskButton>
         </motion.div>
       </div>
+
+      <motion.button
+        onClick={() => navigate("/admin-login")}
+        className="flex items-center gap-1 text-muted-foreground/40 text-[8px] hover:text-muted-foreground/70 transition-colors mt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        <Lock className="w-2.5 h-2.5" />
+        Admin Access
+      </motion.button>
     </motion.div>
   );
 };
