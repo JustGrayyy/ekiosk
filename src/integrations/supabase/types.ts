@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      redemption_logs: {
+        Row: {
+          id: string
+          lrn: string
+          points_redeemed: number
+          redeemed_at: string | null
+          reward_name: string
+        }
+        Insert: {
+          id?: string
+          lrn: string
+          points_redeemed: number
+          redeemed_at?: string | null
+          reward_name: string
+        }
+        Update: {
+          id?: string
+          lrn?: string
+          points_redeemed?: number
+          redeemed_at?: string | null
+          reward_name?: string
+        }
+        Relationships: []
+      }
+      scan_logs: {
+        Row: {
+          id: string
+          lrn: string
+          scanned_at: string | null
+        }
+        Insert: {
+          id?: string
+          lrn: string
+          scanned_at?: string | null
+        }
+        Update: {
+          id?: string
+          lrn?: string
+          scanned_at?: string | null
+        }
+        Relationships: []
+      }
       student_points: {
         Row: {
           full_name: string
