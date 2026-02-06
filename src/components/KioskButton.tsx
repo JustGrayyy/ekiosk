@@ -32,6 +32,7 @@ const KioskButton = ({
 
   return (
     <motion.button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`

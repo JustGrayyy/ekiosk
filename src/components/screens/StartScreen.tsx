@@ -48,6 +48,17 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
           </KioskButton>
         </motion.div>
       </div>
+
+      <motion.button
+        onClick={() => navigate("/admin-login")}
+        className="flex items-center gap-1 text-muted-foreground/40 text-[8px] hover:text-muted-foreground/70 transition-colors mt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        <Lock className="w-2.5 h-2.5" />
+        Admin Access
+      </motion.button>
     </motion.div>
   );
 };
