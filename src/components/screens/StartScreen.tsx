@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
 import KioskButton from "../KioskButton";
 
 interface StartScreenProps {
