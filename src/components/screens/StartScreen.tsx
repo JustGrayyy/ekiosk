@@ -9,6 +9,8 @@ interface StartScreenProps {
 }
 
 const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       className="flex flex-col items-center justify-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 px-2"
