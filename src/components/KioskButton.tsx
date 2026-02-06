@@ -14,6 +14,7 @@ interface KioskButtonProps {
 const KioskButton = ({ 
   children, 
   onClick, 
+  type = "button",
   size = "large", 
   variant = "primary",
   disabled = false,
