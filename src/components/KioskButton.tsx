@@ -3,7 +3,8 @@ import { ReactNode } from "react";
 
 interface KioskButtonProps {
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
   size?: "large" | "medium" | "small";
   variant?: "primary" | "secondary";
   disabled?: boolean;
