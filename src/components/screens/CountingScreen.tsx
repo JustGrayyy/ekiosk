@@ -8,9 +8,10 @@ interface CountingScreenProps {
   onDone: (count: number) => void;
   userLrn: string;
   userName: string;
+  userSection: string;
 }
 
-const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
+const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScreenProps) => {
   const [count, setCount] = useState(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,7 +43,8 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
         student_lrn: userLrn,
         student_name: userName,
         points_to_add: 1,
-      });
+        student_section: userSection || null,
+      } as any);
 
       if (error) throw error;
     } catch (err) {
@@ -53,7 +55,7 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
         variant: "destructive",
       });
     }
-  }, [userLrn, userName]);
+  }, [userLrn, userName, userSection]);
 
   // Handle barcode scanner input (Enter key triggers count)
   const handleKeyDown = useCallback(
@@ -66,7 +68,7 @@ const CountingScreen = ({ onDone, userLrn, userName }: CountingScreenProps) => {
           // Sync to database in background
           syncPointToDatabase();
           // Log scan for analytics
-          supabase.from("scan_logs").insert({ lrn: userLrn }).then(({ error }) => {
+          supabase.from("scan_logs").insert({ lrn: userLrn, section: userSection || null, points_added: 1 } as any).then(({ error }) => {
             if (error) console.error("Error logging scan:", error);
           });
         }

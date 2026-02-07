@@ -9,8 +9,12 @@ import RegistrationStatusChart from "@/components/admin/RegistrationStatusChart"
 import PointsEconomyChart from "@/components/admin/PointsEconomyChart";
 import PeakHoursChart from "@/components/admin/PeakHoursChart";
 import SemesterGoalChart from "@/components/admin/SemesterGoalChart";
+import LiveFeedTable from "@/components/admin/LiveFeedTable";
+import SectionRankingsChart from "@/components/admin/SectionRankingsChart";
 
 const CHARTS = [
+  { title: "Live Feed", Component: LiveFeedTable },
+  { title: "Section Rankings", Component: SectionRankingsChart },
   { title: "Daily Scan Velocity", Component: DailyScanChart },
   { title: "Top 5 Contributors", Component: TopContributorsChart },
   { title: "Registration Status", Component: RegistrationStatusChart },

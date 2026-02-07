@@ -42,17 +42,23 @@ export type Database = {
         Row: {
           id: string
           lrn: string
+          points_added: number | null
           scanned_at: string | null
+          section: string | null
         }
         Insert: {
           id?: string
           lrn: string
+          points_added?: number | null
           scanned_at?: string | null
+          section?: string | null
         }
         Update: {
           id?: string
           lrn?: string
+          points_added?: number | null
           scanned_at?: string | null
+          section?: string | null
         }
         Relationships: []
       }
@@ -62,18 +68,21 @@ export type Database = {
           last_updated: string | null
           lrn: string
           points_balance: number | null
+          section: string | null
         }
         Insert: {
           full_name: string
           last_updated?: string | null
           lrn: string
           points_balance?: number | null
+          section?: string | null
         }
         Update: {
           full_name?: string
           last_updated?: string | null
           lrn?: string
           points_balance?: number | null
+          section?: string | null
         }
         Relationships: []
       }
@@ -82,14 +91,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      increment_points: {
-        Args: {
-          points_to_add?: number
-          student_lrn: string
-          student_name: string
-        }
-        Returns: number
-      }
+      increment_points:
+        | {
+            Args: {
+              points_to_add?: number
+              student_lrn: string
+              student_name: string
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              points_to_add?: number
+              student_lrn: string
+              student_name: string
+              student_section?: string
+            }
+            Returns: number
+          }
     }
     Enums: {
       [_ in never]: never

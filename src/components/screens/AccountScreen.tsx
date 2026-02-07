@@ -1,15 +1,32 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import KioskButton from "../KioskButton";
+import { findClosestSection, VALID_SECTIONS } from "@/lib/fuzzyMatch";
+import { toast } from "@/hooks/use-toast";
 
 interface AccountScreenProps {
-  onSubmit: (name: string, lrn: string) => void;
+  onSubmit: (name: string, lrn: string, section: string) => void;
 }
 
 const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
   const [name, setName] = useState("");
   const [lrn, setLrn] = useState("");
+  const [section, setSection] = useState("");
   const [error, setError] = useState("");
+
+  const normalizeSection = (value: string) => {
+    if (!value.trim()) return;
+    const { corrected, wasAutoCorrected } = findClosestSection(value, VALID_SECTIONS);
+    if (wasAutoCorrected) {
+      setSection(corrected);
+      toast({
+        title: `Did you mean '${corrected}'?`,
+        description: "Auto-selected.",
+      });
+    } else if (corrected) {
+      setSection(corrected);
+    }
+  };
 
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -21,11 +38,12 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
       return;
     }
     setError("");
-    onSubmit(name.trim(), lrn.trim());
+    // Run fuzzy match one more time on submit
+    const { corrected } = findClosestSection(section, VALID_SECTIONS);
+    onSubmit(name.trim(), lrn.trim(), corrected);
   };
 
   const handleLrnChange = (value: string) => {
-    // Only allow numbers
     const numericValue = value.replace(/\D/g, "");
     setLrn(numericValue);
   };
@@ -69,6 +87,18 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
               onChange={(e) => handleLrnChange(e.target.value)}
               className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
               placeholder="Enter your LRN"
+            />
+          </div>
+
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-foreground text-[10px] sm:text-xs md:text-sm">SECTION (OPTIONAL)</label>
+            <input
+              type="text"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              onBlur={(e) => normalizeSection(e.target.value)}
+              className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
+              placeholder="e.g. Prowess, Fortitude..."
             />
           </div>
 

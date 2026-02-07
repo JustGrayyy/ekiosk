@@ -13,11 +13,12 @@ type Screen = "start" | "account" | "deposit" | "counting" | "success" | "checkP
 interface UserData {
   name: string;
   lrn: string;
+  section: string;
 }
 
 const Index = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>("start");
-  const [userData, setUserData] = useState<UserData>({ name: "", lrn: "" });
+  const [userData, setUserData] = useState<UserData>({ name: "", lrn: "", section: "" });
   const [depositCount, setDepositCount] = useState(0);
 
   const handleStart = useCallback(() => {
@@ -32,8 +33,8 @@ const Index = () => {
     setCurrentScreen("start");
   }, []);
 
-  const handleAccountSubmit = useCallback((name: string, lrn: string) => {
-    setUserData({ name, lrn });
+  const handleAccountSubmit = useCallback((name: string, lrn: string, section: string) => {
+    setUserData({ name, lrn, section });
     setCurrentScreen("deposit");
   }, []);
 
@@ -48,7 +49,7 @@ const Index = () => {
 
   const handleComplete = useCallback(() => {
     // Reset all state and go back to start
-    setUserData({ name: "", lrn: "" });
+    setUserData({ name: "", lrn: "", section: "" });
     setDepositCount(0);
     setCurrentScreen("start");
   }, []);
@@ -64,7 +65,7 @@ const Index = () => {
       case "deposit":
         return <DepositScreen key="deposit" onDeposit={handleDeposit} userName={userData.name} />;
       case "counting":
-        return <CountingScreen key="counting" onDone={handleCountingDone} userLrn={userData.lrn} userName={userData.name} />;
+        return <CountingScreen key="counting" onDone={handleCountingDone} userLrn={userData.lrn} userName={userData.name} userSection={userData.section} />;
       case "success":
         return <SuccessScreen key="success" onComplete={handleComplete} depositCount={depositCount} pointsEarned={depositCount} />;
       default:
