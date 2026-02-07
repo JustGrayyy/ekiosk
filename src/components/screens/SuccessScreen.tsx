@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import FunFactCard from "../FunFactCard";
 
 interface SuccessScreenProps {
   onComplete: () => void;
@@ -76,8 +77,12 @@ const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreen
         </motion.div>
       </motion.div>
 
+      <div className="w-full max-w-sm mt-4 sm:mt-6">
+        <FunFactCard />
+      </div>
+
       <motion.p
-        className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs mt-6 sm:mt-7 md:mt-8"
+        className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs mt-4 sm:mt-5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}

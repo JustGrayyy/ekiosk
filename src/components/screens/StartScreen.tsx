@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Lock, Trophy, Users } from "lucide-react";
+import FunFactCard from "../FunFactCard";
 import KioskButton from "../KioskButton";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -151,6 +152,8 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
           )}
         </div>
       </motion.div>
+
+      <FunFactCard />
 
       <motion.button
         onClick={() => navigate("/admin-login")}
