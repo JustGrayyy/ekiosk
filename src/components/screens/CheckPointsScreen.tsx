@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { QrCode } from "lucide-react";
 import KioskButton from "../KioskButton";
 import RedeemModal from "./RedeemModal";
+import QrScannerModal from "../QrScannerModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -21,6 +23,7 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [error, setError] = useState("");
   const [showRedeemModal, setShowRedeemModal] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -88,6 +91,37 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
     }
   };
 
+  const handleQrScan = useCallback(async (scannedLrn: string) => {
+    setLrn(scannedLrn);
+    setShowQrScanner(false);
+    // Auto-trigger search with the scanned LRN
+    setLoading(true);
+    setError("");
+    setStudentData(null);
+    try {
+      const { data, error: queryError } = await supabase
+        .from("student_points")
+        .select("*")
+        .eq("lrn", scannedLrn)
+        .maybeSingle();
+      if (queryError) throw queryError;
+      if (data) {
+        setStudentData(data);
+      } else {
+        setError("Student not found");
+      }
+    } catch (err) {
+      console.error("Error fetching student:", err);
+      toast({
+        title: "Error",
+        description: "Failed to fetch student data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <motion.div
       className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 w-full max-w-[95%] sm:max-w-sm md:max-w-md px-2"
@@ -116,21 +150,31 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
             <p className="text-foreground text-[10px] sm:text-xs md:text-sm mb-3 sm:mb-4 text-center">
               ENTER YOUR LRN
             </p>
-            <input
-              ref={inputRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={lrn}
-              onChange={(e) => {
-                setLrn(e.target.value.replace(/\D/g, ""));
-                setError("");
-              }}
-              onKeyDown={handleKeyDown}
-              className="w-full bg-background border-2 border-primary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center text-base sm:text-lg md:text-xl text-foreground focus:outline-none focus:border-primary transition-colors min-h-[44px]"
-              placeholder="000000000000"
-              maxLength={12}
-            />
+            <div className="relative w-full">
+              <input
+                ref={inputRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={lrn}
+                onChange={(e) => {
+                  setLrn(e.target.value.replace(/\D/g, ""));
+                  setError("");
+                }}
+                onKeyDown={handleKeyDown}
+                className="w-full bg-background border-2 border-primary/50 rounded-lg sm:rounded-xl p-3 sm:p-4 pr-12 text-center text-base sm:text-lg md:text-xl text-foreground focus:outline-none focus:border-primary transition-colors min-h-[44px]"
+                placeholder="000000000000"
+                maxLength={12}
+              />
+              <button
+                type="button"
+                onClick={() => setShowQrScanner(true)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors"
+                aria-label="Scan QR Code"
+              >
+                <QrCode className="h-5 w-5 sm:h-6 sm:w-6" />
+              </button>
+            </div>
             {error && (
               <motion.p
                 className="text-destructive text-[10px] sm:text-xs md:text-sm mt-2 sm:mt-3 text-center"
@@ -220,6 +264,12 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
           onRedeemSuccess={handleRedeemSuccess}
         />
       )}
+
+      <QrScannerModal
+        isOpen={showQrScanner}
+        onClose={() => setShowQrScanner(false)}
+        onScan={handleQrScan}
+      />
     </motion.div>
   );
 };
