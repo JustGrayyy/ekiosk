@@ -131,7 +131,6 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
     try {
       const dataUrl = await htmlToImage.toPng(qrRef.current, {
         backgroundColor: "#ffffff",
-        padding: 20,
       });
       const link = document.createElement("a");
       link.download = `Student-ID-${studentData.lrn}.png`;
