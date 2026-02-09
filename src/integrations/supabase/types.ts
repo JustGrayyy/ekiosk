@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      allowed_products: {
+        Row: {
+          barcode: string
+          category: string
+          name: string
+          points_value: number
+        }
+        Insert: {
+          barcode: string
+          category?: string
+          name: string
+          points_value?: number
+        }
+        Update: {
+          barcode?: string
+          category?: string
+          name?: string
+          points_value?: number
+        }
+        Relationships: []
+      }
       redemption_logs: {
         Row: {
           id: string
@@ -43,6 +64,7 @@ export type Database = {
           id: string
           lrn: string
           points_added: number | null
+          product_name: string | null
           scanned_at: string | null
           section: string | null
         }
@@ -50,6 +72,7 @@ export type Database = {
           id?: string
           lrn: string
           points_added?: number | null
+          product_name?: string | null
           scanned_at?: string | null
           section?: string | null
         }
@@ -57,6 +80,7 @@ export type Database = {
           id?: string
           lrn?: string
           points_added?: number | null
+          product_name?: string | null
           scanned_at?: string | null
           section?: string | null
         }

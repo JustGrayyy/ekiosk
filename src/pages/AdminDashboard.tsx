@@ -11,6 +11,8 @@ import PeakHoursChart from "@/components/admin/PeakHoursChart";
 import SemesterGoalChart from "@/components/admin/SemesterGoalChart";
 import LiveFeedTable from "@/components/admin/LiveFeedTable";
 import SectionRankingsChart from "@/components/admin/SectionRankingsChart";
+import ProductListTable from "@/components/admin/ProductListTable";
+import AddProductForm from "@/components/admin/AddProductForm";
 
 const CHARTS = [
   { title: "Live Feed", Component: LiveFeedTable },
@@ -21,6 +23,8 @@ const CHARTS = [
   { title: "Points Economy", Component: PointsEconomyChart },
   { title: "Peak Hours", Component: PeakHoursChart },
   { title: "Semester Goal", Component: SemesterGoalChart },
+  { title: "Product Whitelist", Component: ProductListTable },
+  { title: "Register New Item", Component: AddProductForm },
 ];
 
 const AdminDashboard = () => {

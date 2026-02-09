@@ -14,15 +14,14 @@ interface CountingScreenProps {
 const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScreenProps) => {
   const [count, setCount] = useState(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
+  const scanningRef = useRef(false);
 
-  // Auto-focus the hidden input on mount
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
     }
   }, []);
 
-  // Re-focus input when clicking anywhere except buttons
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -30,22 +29,18 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         hiddenInputRef.current.focus();
       }
     };
-
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  // Sync points to database using atomic increment
   const syncPointToDatabase = useCallback(async () => {
     try {
-      // Use atomic increment function to prevent race conditions
       const { error } = await supabase.rpc("increment_points", {
         student_lrn: userLrn,
         student_name: userName,
         points_to_add: 1,
         student_section: userSection || null,
       } as any);
-
       if (error) throw error;
     } catch (err) {
       console.error("Error syncing point to database:", err);
@@ -57,27 +52,56 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
     }
   }, [userLrn, userName, userSection]);
 
-  // Handle barcode scanner input (Enter key triggers count)
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") {
-        const code = hiddenInputRef.current?.value.trim();
-        if (code) {
-          // Optimistic update: increment local count immediately
-          setCount((prev) => prev + 1);
-          // Sync to database in background
-          syncPointToDatabase();
-          // Log scan for analytics
-          supabase.from("scan_logs").insert({ lrn: userLrn, section: userSection || null, points_added: 1 } as any).then(({ error }) => {
+    async (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key !== "Enter") return;
+      const code = hiddenInputRef.current?.value.trim();
+      if (hiddenInputRef.current) hiddenInputRef.current.value = "";
+      if (!code || scanningRef.current) return;
+
+      scanningRef.current = true;
+      try {
+        const { data: product, error } = await supabase
+          .from("allowed_products" as any)
+          .select("*")
+          .eq("barcode", code)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Barcode lookup error:", error);
+          toast({ title: "Lookup Error", description: "Could not verify barcode.", variant: "destructive" });
+          return;
+        }
+
+        if (!product) {
+          toast({ title: "Unknown Item", description: "This barcode is not in our system.", variant: "destructive" });
+          return;
+        }
+
+        const p = product as any;
+        if (p.category !== "bottle") {
+          toast({
+            title: "Rejected",
+            description: `${p.name} is not a bottle.`,
+          });
+          return;
+        }
+
+        // Valid bottle
+        setCount((prev) => prev + 1);
+        toast({ title: "Accepted", description: `${p.name} (+1 Point)` });
+        syncPointToDatabase();
+        supabase
+          .from("scan_logs")
+          .insert({ lrn: userLrn, section: userSection || null, points_added: 1, product_name: p.name } as any)
+          .then(({ error }) => {
             if (error) console.error("Error logging scan:", error);
           });
-        }
-        if (hiddenInputRef.current) {
-          hiddenInputRef.current.value = "";
-        }
+      } finally {
+        scanningRef.current = false;
       }
     },
-    [syncPointToDatabase]
+    [syncPointToDatabase, userLrn, userSection]
   );
 
   return (
@@ -88,7 +112,6 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Hidden input for barcode scanner */}
       <input
         ref={hiddenInputRef}
         type="text"
@@ -129,16 +152,8 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         </div>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.3 }}
-      >
-        <KioskButton
-          onClick={() => onDone(count)}
-          size="medium"
-          className={count > 0 ? "animate-pulse-glow" : ""}
-        >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.3 }}>
+        <KioskButton onClick={() => onDone(count)} size="medium" className={count > 0 ? "animate-pulse-glow" : ""}>
           DONE
         </KioskButton>
       </motion.div>
