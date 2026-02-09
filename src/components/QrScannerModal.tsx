@@ -51,7 +51,7 @@ const QrScannerModal = ({ isOpen, onClose, onScan }: QrScannerModalProps) => {
         scannerRef.current = scanner;
 
         await scanner.start(
-          { facingMode: "environment" },
+          { facingMode: "user" },
           { fps: 10, qrbox: { width: 220, height: 220 } },
           (decodedText) => {
             if (processedRef.current) return;
