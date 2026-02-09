@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { QrCode, Printer } from "lucide-react";
+import { QrCode, Printer, Download } from "lucide-react";
 import QRCode from "react-qr-code";
+import * as htmlToImage from "html-to-image";
 import KioskButton from "../KioskButton";
 import RedeemModal from "./RedeemModal";
 import QrScannerModal from "../QrScannerModal";
@@ -26,6 +27,7 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
   const [showRedeemModal, setShowRedeemModal] = useState(false);
   const [showQrScanner, setShowQrScanner] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -122,6 +124,32 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
       setLoading(false);
     }
   }, []);
+
+  const downloadQR = useCallback(async () => {
+    if (!qrRef.current || !studentData) return;
+    
+    try {
+      const dataUrl = await htmlToImage.toPng(qrRef.current, {
+        backgroundColor: "#ffffff",
+        padding: 20,
+      });
+      const link = document.createElement("a");
+      link.download = `Student-ID-${studentData.lrn}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast({
+        title: "Success",
+        description: "Digital ID downloaded successfully.",
+      });
+    } catch (err) {
+      console.error("Failed to download QR:", err);
+      toast({
+        title: "Error",
+        description: "Failed to download Digital ID.",
+        variant: "destructive",
+      });
+    }
+  }, [studentData]);
 
   return (
     <motion.div
@@ -227,6 +255,17 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
               >
                 {studentData.points_balance.toLocaleString()}
               </motion.p>
+            </div>
+
+            <div className="mt-8 flex flex-col items-center">
+              <p className="text-foreground/70 text-[10px] sm:text-xs md:text-sm mb-4">YOUR DIGITAL ID</p>
+              <div ref={qrRef} className="bg-white p-4 rounded-xl shadow-lg mb-4">
+                <QRCode value={studentData.lrn} size={150} />
+              </div>
+              <KioskButton onClick={downloadQR} size="small" variant="secondary" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                SAVE ID
+              </KioskButton>
             </div>
           </motion.div>
 

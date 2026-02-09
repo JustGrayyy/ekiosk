@@ -61,6 +61,20 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
       if (hiddenInputRef.current) hiddenInputRef.current.value = "";
       if (!code || scanningRef.current) return;
 
+      // Anti-Double Scan Logic
+      const now = Date.now();
+      if (code === lastScannedCode && now - lastScanTime < 3000) {
+        toast({
+          title: "Already scanned",
+          description: "Please scan next item.",
+          className: "bg-yellow-500 text-white",
+        });
+        return;
+      }
+
+      setLastScannedCode(code);
+      setLastScanTime(now);
+
       scanningRef.current = true;
       try {
         const { data: product, error } = await supabase
@@ -103,7 +117,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         scanningRef.current = false;
       }
     },
-    [syncPointToDatabase, userLrn, userSection]
+    [syncPointToDatabase, userLrn, userSection, lastScannedCode, lastScanTime]
   );
 
   return (
