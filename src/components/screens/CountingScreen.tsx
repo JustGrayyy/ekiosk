@@ -15,6 +15,8 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
   const [count, setCount] = useState(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const scanningRef = useRef(false);
+  const [lastScannedCode, setLastScannedCode] = useState<string | null>(null);
+  const [lastScanTime, setLastScanTime] = useState(0);
 
   useEffect(() => {
     if (hiddenInputRef.current) {

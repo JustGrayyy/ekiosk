@@ -13,6 +13,8 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
   const [lrn, setLrn] = useState("");
   const [section, setSection] = useState("");
   const [error, setError] = useState("");
+  const [showQrScanner, setShowQrScanner] = useState(false);
+  const [isLrnLocked, setIsLrnLocked] = useState(false);
 
   const normalizeSection = (value: string) => {
     if (!value.trim()) return;

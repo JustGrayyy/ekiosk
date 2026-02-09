@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { QrCode } from "lucide-react";
+import { QrCode, Printer } from "lucide-react";
+import QRCode from "react-qr-code";
 import KioskButton from "../KioskButton";
 import RedeemModal from "./RedeemModal";
 import QrScannerModal from "../QrScannerModal";
