@@ -152,7 +152,7 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
 
   return (
     <motion.div
-      className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 w-full max-w-[95%] sm:max-w-sm md:max-w-md px-2"
+      className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 w-full max-w-[95%] sm:max-w-md md:max-w-lg lg:max-w-xl px-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
