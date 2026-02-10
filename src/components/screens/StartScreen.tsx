@@ -78,12 +78,13 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
         TOUCH TO BEGIN YOUR DEPOSIT
       </motion.p>
 
-      <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+      <div className="flex flex-col items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 w-full">
         <motion.div
           animate={{ scale: [1, 1.02, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-full flex justify-center"
         >
-          <KioskButton onClick={onStart} className="animate-pulse-glow">
+          <KioskButton onClick={onStart} className="animate-pulse-glow w-full max-w-sm">
             START
           </KioskButton>
         </motion.div>
@@ -92,8 +93,9 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
+          className="w-full flex justify-center"
         >
-          <KioskButton onClick={onCheckPoints} size="medium" variant="secondary">
+          <KioskButton onClick={onCheckPoints} size="medium" variant="secondary" className="w-full max-w-sm">
             CHECK POINTS
           </KioskButton>
         </motion.div>
