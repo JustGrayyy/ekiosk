@@ -6,11 +6,13 @@ import * as htmlToImage from "html-to-image";
 import KioskButton from "../KioskButton";
 import RedeemModal from "./RedeemModal";
 import QrScannerModal from "../QrScannerModal";
+import StartScreen from "./StartScreen";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface CheckPointsScreenProps {
   onBack: () => void;
+  isStudentPortal?: boolean;
 }
 
 interface StudentData {
@@ -19,7 +21,7 @@ interface StudentData {
   points_balance: number;
 }
 
-const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
+const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScreenProps) => {
   const [lrn, setLrn] = useState("");
   const [loading, setLoading] = useState(false);
   const [studentData, setStudentData] = useState<StudentData | null>(null);
@@ -220,9 +222,11 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <KioskButton onClick={onBack} size="small" variant="secondary">
-              BACK
-            </KioskButton>
+            {!isStudentPortal && (
+              <KioskButton onClick={onBack} size="small" variant="secondary">
+                BACK
+              </KioskButton>
+            )}
             <KioskButton onClick={handleSearch} size="small" disabled={loading}>
               {loading ? "..." : "SEARCH"}
             </KioskButton>
@@ -287,9 +291,11 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
               <KioskButton onClick={handleReset} size="small" variant="secondary">
                 NEW SEARCH
               </KioskButton>
-              <KioskButton onClick={onBack} size="small" variant="secondary">
-                BACK
-              </KioskButton>
+              {!isStudentPortal && (
+                <KioskButton onClick={onBack} size="small" variant="secondary">
+                  BACK
+                </KioskButton>
+              )}
             </div>
           </motion.div>
         </>
@@ -302,6 +308,16 @@ const CheckPointsScreen = ({ onBack }: CheckPointsScreenProps) => {
           onClose={() => setShowRedeemModal(false)}
           onRedeemSuccess={handleRedeemSuccess}
         />
+      )}
+
+      {isStudentPortal && (
+        <div className="w-full mt-8 border-t border-primary/20 pt-8 flex flex-col items-center gap-8">
+          <StartScreen 
+            onStart={() => {}} 
+            onCheckPoints={() => {}} 
+            isStudentPortal={true} 
+          />
+        </div>
       )}
 
       <QrScannerModal

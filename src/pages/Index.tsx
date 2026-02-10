@@ -67,7 +67,7 @@ const Index = ({ isStudentPortal = false }: IndexProps) => {
       case "start":
         return <StartScreen key="start" onStart={handleStart} onCheckPoints={handleCheckPoints} isStudentPortal={isStudentPortal} />;
       case "checkPoints":
-        return <CheckPointsScreen key="checkPoints" onBack={handleBackToStart} />;
+        return <CheckPointsScreen key="checkPoints" onBack={handleBackToStart} isStudentPortal={isStudentPortal} />;
       case "account":
         return <AccountScreen key="account" onSubmit={handleAccountSubmit} />;
       case "deposit":

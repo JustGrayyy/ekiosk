@@ -94,16 +94,18 @@ const StartScreen = ({ onStart, onCheckPoints, isStudentPortal = false }: StartS
           </motion.div>
         )}
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="w-full flex justify-center"
-        >
-          <KioskButton onClick={onCheckPoints} size="medium" variant="secondary" className="w-full max-w-sm">
-            CHECK POINTS
-          </KioskButton>
-        </motion.div>
+        {!isStudentPortal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="w-full flex justify-center"
+          >
+            <KioskButton onClick={onCheckPoints} size="medium" variant="secondary" className="w-full max-w-sm">
+              CHECK POINTS
+            </KioskButton>
+          </motion.div>
+        )}
       </div>
 
       {/* Dual Leaderboards */}
