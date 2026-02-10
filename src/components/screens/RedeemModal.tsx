@@ -19,9 +19,16 @@ interface Reward {
 }
 
 const REWARDS: Reward[] = [
-  { id: "supplies", name: "School Supplies Pack", cost: 50, icon: "📚" },
-  { id: "canteen", name: "Canteen Voucher", cost: 100, icon: "🍔" },
-  { id: "premium", name: "Premium Item", cost: 200, icon: "🎁" },
+  { id: "notebook", name: "Notebook", cost: 30, icon: "📓" },
+  { id: "yellowpad-whole", name: "1 Whole Yellow Pad", cost: 28, icon: "📝" },
+  { id: "yellowpad-length", name: "1/2 Yellow Pad (Lengthwise)", cost: 23, icon: "📝" },
+  { id: "yellowpad-cross", name: "1/2 Yellow Pad (Crosswise)", cost: 23, icon: "📝" },
+  { id: "yellowpad-1-4", name: "1/4 Yellow Pad", cost: 20, icon: "📝" },
+  { id: "correction-tape", name: "Correction Tape", cost: 13, icon: "⌫" },
+  { id: "ballpen", name: "Ballpen", cost: 12, icon: "🖊️" },
+  { id: "pencil", name: "Pencil", cost: 10, icon: "✏️" },
+  { id: "ruler", name: "Ruler", cost: 9, icon: "📏" },
+  { id: "eraser", name: "Eraser", cost: 8, icon: "🧽" }
 ];
 
 const RedeemModal = ({
