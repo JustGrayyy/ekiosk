@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface StartScreenProps {
   onStart: () => void;
   onCheckPoints: () => void;
+  isStudentPortal?: boolean;
 }
 
 interface StudentEntry {
@@ -21,7 +22,7 @@ interface SectionEntry {
   total_points: number;
 }
 
-const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
+const StartScreen = ({ onStart, onCheckPoints, isStudentPortal = false }: StartScreenProps) => {
   const navigate = useNavigate();
   const [topStudents, setTopStudents] = useState<StudentEntry[]>([]);
   const [topSections, setTopSections] = useState<SectionEntry[]>([]);
@@ -69,25 +70,29 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.4 }}
     >
-      <motion.p
-        className="text-foreground/70 text-[10px] sm:text-xs md:text-sm lg:text-base text-center max-w-xs sm:max-w-sm md:max-w-md px-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        TOUCH TO BEGIN YOUR DEPOSIT
-      </motion.p>
+      {!isStudentPortal && (
+        <motion.p
+          className="text-foreground/70 text-[10px] sm:text-xs md:text-sm lg:text-base text-center max-w-xs sm:max-w-sm md:max-w-md px-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          TOUCH TO BEGIN YOUR DEPOSIT
+        </motion.p>
+      )}
 
       <div className="flex flex-col items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 w-full">
-        <motion.div
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="w-full flex justify-center"
-        >
-          <KioskButton onClick={onStart} className="animate-pulse-glow w-full max-w-sm">
-            START
-          </KioskButton>
-        </motion.div>
+        {!isStudentPortal && (
+          <motion.div
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-full flex justify-center"
+          >
+            <KioskButton onClick={onStart} className="animate-pulse-glow w-full max-w-sm">
+              START
+            </KioskButton>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -157,16 +162,18 @@ const StartScreen = ({ onStart, onCheckPoints }: StartScreenProps) => {
 
       <FunFactCard />
 
-      <motion.button
-        onClick={() => navigate("/admin-login")}
-        className="flex items-center gap-1 text-muted-foreground/40 text-[8px] hover:text-muted-foreground/70 transition-colors mt-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
-        <Lock className="w-2.5 h-2.5" />
-        Admin Access
-      </motion.button>
+      {!isStudentPortal && (
+        <motion.button
+          onClick={() => navigate("/admin-login")}
+          className="flex items-center gap-1 text-muted-foreground/40 text-[8px] hover:text-muted-foreground/70 transition-colors mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          <Lock className="w-2.5 h-2.5" />
+          Admin Access
+        </motion.button>
+      )}
     </motion.div>
   );
 };

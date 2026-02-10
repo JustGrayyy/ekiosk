@@ -16,48 +16,56 @@ interface UserData {
   section: string;
 }
 
-const Index = () => {
-  const [currentScreen, setCurrentScreen] = useState<Screen>("start");
+interface IndexProps {
+  isStudentPortal?: boolean;
+}
+
+const Index = ({ isStudentPortal = false }: IndexProps) => {
+  const [currentScreen, setCurrentScreen] = useState<Screen>(isStudentPortal ? "checkPoints" : "start");
   const [userData, setUserData] = useState<UserData>({ name: "", lrn: "", section: "" });
   const [depositCount, setDepositCount] = useState(0);
 
   const handleStart = useCallback(() => {
+    if (isStudentPortal) return;
     setCurrentScreen("account");
-  }, []);
+  }, [isStudentPortal]);
 
   const handleCheckPoints = useCallback(() => {
     setCurrentScreen("checkPoints");
   }, []);
 
   const handleBackToStart = useCallback(() => {
-    setCurrentScreen("start");
-  }, []);
+    setCurrentScreen(isStudentPortal ? "checkPoints" : "start");
+  }, [isStudentPortal]);
 
   const handleAccountSubmit = useCallback((name: string, lrn: string, section: string) => {
+    if (isStudentPortal) return;
     setUserData({ name, lrn, section });
     setCurrentScreen("deposit");
-  }, []);
+  }, [isStudentPortal]);
 
   const handleDeposit = useCallback(() => {
+    if (isStudentPortal) return;
     setCurrentScreen("counting");
-  }, []);
+  }, [isStudentPortal]);
 
   const handleCountingDone = useCallback((count: number) => {
+    if (isStudentPortal) return;
     setDepositCount(count);
     setCurrentScreen("success");
-  }, []);
+  }, [isStudentPortal]);
 
   const handleComplete = useCallback(() => {
     // Reset all state and go back to start
     setUserData({ name: "", lrn: "", section: "" });
     setDepositCount(0);
-    setCurrentScreen("start");
-  }, []);
+    setCurrentScreen(isStudentPortal ? "checkPoints" : "start");
+  }, [isStudentPortal]);
 
   const renderScreen = () => {
     switch (currentScreen) {
       case "start":
-        return <StartScreen key="start" onStart={handleStart} onCheckPoints={handleCheckPoints} />;
+        return <StartScreen key="start" onStart={handleStart} onCheckPoints={handleCheckPoints} isStudentPortal={isStudentPortal} />;
       case "checkPoints":
         return <CheckPointsScreen key="checkPoints" onBack={handleBackToStart} />;
       case "account":
@@ -69,7 +77,7 @@ const Index = () => {
       case "success":
         return <SuccessScreen key="success" onComplete={handleComplete} depositCount={depositCount} pointsEarned={depositCount} />;
       default:
-        return <StartScreen key="start" onStart={handleStart} onCheckPoints={handleCheckPoints} />;
+        return <StartScreen key="start" onStart={handleStart} onCheckPoints={handleCheckPoints} isStudentPortal={isStudentPortal} />;
     }
   };
 
