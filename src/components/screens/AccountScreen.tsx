@@ -134,7 +134,7 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
                 type="text"
                 inputMode="numeric"
                 value={lrn}
-                disabled={loading || (showRegistration && isLrnLocked)}
+                disabled={loading}
                 onChange={(e) => handleLrnChange(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !showRegistration && handleLrnSubmit(lrn)}
                 className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 pr-12 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px] disabled:opacity-70"
@@ -158,37 +158,28 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
             </div>
           </div>
 
-          {(showRegistration || name || section) && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="space-y-4 sm:space-y-5 md:space-y-6"
-            >
-              <div className="space-y-1 sm:space-y-2">
-                <label className="text-foreground text-[10px] sm:text-xs md:text-sm">FULL NAME</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
-                  placeholder="First Last"
-                  autoFocus={showRegistration}
-                />
-              </div>
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-foreground text-[10px] sm:text-xs md:text-sm">FULL NAME</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
+              placeholder="First Last"
+            />
+          </div>
 
-              <div className="space-y-1 sm:space-y-2">
-                <label className="text-foreground text-[10px] sm:text-xs md:text-sm">SECTION (OPTIONAL)</label>
-                <input
-                  type="text"
-                  value={section}
-                  onChange={(e) => setSection(e.target.value)}
-                  onBlur={(e) => normalizeSection(e.target.value)}
-                  className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
-                  placeholder="e.g. Prowess, Fortitude..."
-                />
-              </div>
-            </motion.div>
-          )}
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-foreground text-[10px] sm:text-xs md:text-sm">SECTION (OPTIONAL)</label>
+            <input
+              type="text"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              onBlur={(e) => normalizeSection(e.target.value)}
+              className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
+              placeholder="e.g. Prowess, Fortitude..."
+            />
+          </div>
 
           {error && (
             <motion.p
@@ -201,19 +192,6 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
           )}
 
           <div className="mt-6 sm:mt-7 md:mt-8 flex gap-4 justify-center">
-            {showRegistration && (
-              <KioskButton 
-                onClick={() => {
-                  setShowRegistration(false);
-                  setName("");
-                  setSection("");
-                }} 
-                size="medium" 
-                variant="secondary"
-              >
-                BACK
-              </KioskButton>
-            )}
             <KioskButton 
               onClick={() => showRegistration ? handleManualSubmit() : handleLrnSubmit(lrn)} 
               size="medium" 
