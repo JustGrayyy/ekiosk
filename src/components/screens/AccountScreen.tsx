@@ -117,87 +117,53 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
       transition={{ duration: 0.4 }}
     >
       <div className="kiosk-panel rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10">
-        {!showRegistration ? (
-          <>
-            <motion.h2
-              className="text-primary text-center text-xs sm:text-sm md:text-base lg:text-xl mb-4 sm:mb-6 md:mb-8 leading-relaxed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              SCAN YOUR ID OR<br />ENTER YOUR LRN
-            </motion.h2>
+        <motion.h2
+          className="text-primary text-center text-xs sm:text-sm md:text-base lg:text-xl mb-4 sm:mb-6 md:mb-8 leading-relaxed"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          {showRegistration ? "NEW STUDENT REGISTRATION" : "TYPE IN YOUR ACCOUNT INFORMATION"}
+        </motion.h2>
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-foreground text-[10px] sm:text-xs md:text-sm">LRN</label>
-                <div className="relative w-full">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={lrn}
-                    disabled={loading}
-                    onChange={(e) => handleLrnChange(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleLrnSubmit(lrn)}
-                    className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 pr-12 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px] disabled:opacity-70"
-                    placeholder="Enter or Scan LRN"
-                    maxLength={12}
-                  />
-                  {!loading && (
-                    <button
-                      type="button"
-                      onClick={() => setShowQrScanner(true)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors"
-                    >
-                      <QrCode className="h-6 w-6" />
-                    </button>
-                  )}
-                  {loading && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary">
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {error && (
-                <motion.p
-                  className="text-destructive text-[10px] sm:text-xs md:text-sm text-center"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
+        <div className="space-y-4 sm:space-y-5 md:space-y-6">
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-foreground text-[10px] sm:text-xs md:text-sm">LRN</label>
+            <div className="relative w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={lrn}
+                disabled={loading || (showRegistration && isLrnLocked)}
+                onChange={(e) => handleLrnChange(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !showRegistration && handleLrnSubmit(lrn)}
+                className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 pr-12 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px] disabled:opacity-70"
+                placeholder="Enter or Scan LRN"
+                maxLength={12}
+              />
+              {!loading && !showRegistration && (
+                <button
+                  type="button"
+                  onClick={() => setShowQrScanner(true)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary hover:text-primary/80 transition-colors"
                 >
-                  {error}
-                </motion.p>
+                  <QrCode className="h-6 w-6" />
+                </button>
               )}
-
-              <div className="flex justify-center">
-                <KioskButton onClick={() => handleLrnSubmit(lrn)} size="medium" disabled={loading}>
-                  {loading ? "CHECKING..." : "NEXT"}
-                </KioskButton>
-              </div>
+              {loading && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              )}
             </div>
-          </>
-        ) : (
-          <>
-            <motion.h2
-              className="text-primary text-center text-xs sm:text-sm md:text-base lg:text-xl mb-4 sm:mb-6 md:mb-8 leading-relaxed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+          </div>
+
+          {(showRegistration || name || section) && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="space-y-4 sm:space-y-5 md:space-y-6"
             >
-              NEW STUDENT REGISTRATION
-            </motion.h2>
-
-            <div className="space-y-4 sm:space-y-5 md:space-y-6">
-              <div className="space-y-1 sm:space-y-2">
-                <label className="text-foreground text-[10px] sm:text-xs md:text-sm">LRN</label>
-                <input
-                  type="text"
-                  value={lrn}
-                  disabled
-                  className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg opacity-70"
-                />
-              </div>
-
               <div className="space-y-1 sm:space-y-2">
                 <label className="text-foreground text-[10px] sm:text-xs md:text-sm">FULL NAME</label>
                 <input
@@ -206,7 +172,7 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
                   onChange={(e) => setName(e.target.value)}
                   className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px]"
                   placeholder="First Last"
-                  autoFocus
+                  autoFocus={showRegistration}
                 />
               </div>
 
@@ -221,28 +187,42 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
                   placeholder="e.g. Prowess, Fortitude..."
                 />
               </div>
+            </motion.div>
+          )}
 
-              {error && (
-                <motion.p
-                  className="text-destructive text-[10px] sm:text-xs md:text-sm text-center"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  {error}
-                </motion.p>
-              )}
-            </div>
+          {error && (
+            <motion.p
+              className="text-destructive text-[10px] sm:text-xs md:text-sm text-center"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {error}
+            </motion.p>
+          )}
 
-            <div className="mt-6 sm:mt-7 md:mt-8 flex gap-4 justify-center">
-              <KioskButton onClick={() => setShowRegistration(false)} size="medium" variant="secondary">
+          <div className="mt-6 sm:mt-7 md:mt-8 flex gap-4 justify-center">
+            {showRegistration && (
+              <KioskButton 
+                onClick={() => {
+                  setShowRegistration(false);
+                  setName("");
+                  setSection("");
+                }} 
+                size="medium" 
+                variant="secondary"
+              >
                 BACK
               </KioskButton>
-              <KioskButton onClick={handleManualSubmit} size="medium">
-                REGISTER
-              </KioskButton>
-            </div>
-          </>
-        )}
+            )}
+            <KioskButton 
+              onClick={() => showRegistration ? handleManualSubmit() : handleLrnSubmit(lrn)} 
+              size="medium" 
+              disabled={loading}
+            >
+              {loading ? "CHECKING..." : (showRegistration ? "REGISTER" : "NEXT")}
+            </KioskButton>
+          </div>
+        </div>
       </div>
 
       <QrScannerModal
