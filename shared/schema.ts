@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const studentPoints = pgTable("student_points", {
@@ -36,5 +36,18 @@ export const allowedProducts = pgTable("allowed_products", {
 export const suggestions = pgTable("suggestions", {
   id: uuid("id").primaryKey().defaultRandom(),
   message: text("message").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const sentimentLogs = pgTable("sentiment_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  feeling: text("feeling").notNull(), // Happy, Proud, Neutral
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const triviaLogs = pgTable("trivia_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  questionId: integer("question_id").notNull(),
+  isCorrect: boolean("is_correct").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });

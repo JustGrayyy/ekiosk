@@ -17,7 +17,7 @@ const SuggestionTable: React.FC = () => {
   const fetchSuggestions = async () => {
     try {
       const { data, error } = await supabase
-        .from("suggestions")
+        .from("suggestions" as any)
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -37,7 +37,7 @@ const SuggestionTable: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
-        .from("suggestions")
+        .from("suggestions" as any)
         .delete()
         .eq("id", id);
 

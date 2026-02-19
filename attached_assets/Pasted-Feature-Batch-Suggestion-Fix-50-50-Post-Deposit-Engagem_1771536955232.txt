@@ -1,0 +1,70 @@
+Feature Batch: Suggestion Fix, 50/50 Post-Deposit Engagement, & Admin Graphs
+Context:
+I need to troubleshoot the suggestion box which is currently not showing on admin dashboard. After that, I want to implement a highly innovative post-deposit engagement screen. When a student successfully deposits an item, there should be a 50% chance they get an "Eco-Trivia" question, and a 50% chance they get an "Eco-Sentiment" question. Finally, I need these visualized in the Admin Dashboard.
+Task 1: Fix the Suggestion Box Error
+• The Issue: Submitting a suggestion is failing or silently erroring.
+• The Fix: Please add robust error logging to the insert function for suggestions (e.g., console.error(error.message)). Ensure the Supabase call does not require an authenticated user if it's on the public portal. Note: I will ensure the suggestions table exists and RLS allows anonymous inserts on my end. Show a clear error toast if it fails, and a success toast if it works.
+Task 2: The 50/50 Post-Deposit Router
+• After a successful deposit (points are added), do not just close the screen. Instead, trigger a new PostDepositModal.
+• The Logic: Inside this modal, use Math.random() < 0.5 to decide which component to render: <EcoTrivia /> or <EcoSentiment />.
+Task 3: Eco-Sentiment Component (Affective Computing)
+• UI: Ask: "Awesome job! How do you feel after recycling today?"
+• Buttons: Provide 3 large emoji buttons: 😊 Happy, 🦸 Proud, 😐 Neutral.
+• Action: When clicked, save the response to a new sentiment_logs table in Supabase (columns: feeling, created_at). Then, close the modal and play the success sound.
+Task 4: Eco-Trivia Component (Gamification)
+• UI: Ask a random recycling trivia question. (e.g., "What % of global plastic is actually recycled?"). Provide 3 multiple-choice answers (e.g., "9%", "50%", "100%").
+• Mechanic: Add a visual 5-second countdown timer.
+• Action (Win): If they click the correct answer before time runs out, show a celebration message, add +1 Bonus Point to their student_points balance in Supabase, and log is_correct: true to a new trivia_logs table.
+• Action (Loss/Timeout): If wrong or time runs out, show the correct answer, log is_correct: false, and close the modal.
+Task 5: Admin Dashboard Analytics (The "Wow" Factor)
+• Navigate to the Admin Dashboard and use recharts to add two new charts below the existing metrics:
+• Chart 1 (Sentiment Analysis): A Pie Chart or Bar Chart showing the distribution of Happy vs. Proud vs. Neutral feelings.
+• Chart 2 (Trivia Success Rate): A Donut Chart showing the percentage of Correct vs. Incorrect trivia answers.
+
+
+Please use this exact JSON array of questions for the Eco-Trivia component. Ensure the component randomly selects one question from this list every time the modal opens. When the user selects an answer or time runs out, show the 'explanation' text briefly before closing the modal.
+
+[
+  {
+    "id": 1,
+    "question": "What percentage of all plastic ever made has actually been recycled?",
+    "options": ["About 9%", "About 25%", "About 50%"],
+    "correctAnswer": "About 9%",
+    "explanation": "Only ~9% of plastic is recycled globally, which is why your kiosk is so important!"
+  },
+  {
+    "id": 2,
+    "question": "How long does a standard plastic bottle take to decompose?",
+    "options": ["50 years", "450 years", "1,000 years"],
+    "correctAnswer": "450 years",
+    "explanation": "PET plastic takes up to 450 years to break down in a landfill."
+  },
+  {
+    "id": 3,
+    "question": "Recycling one plastic bottle saves enough energy to power a laptop for how long?",
+    "options": ["10 minutes", "2 hours", "12 hours"],
+    "correctAnswer": "2 hours",
+    "explanation": "Recycling plastic saves massive amounts of energy compared to making new plastic."
+  },
+  {
+    "id": 4,
+    "question": "Which of these materials can be recycled infinitely without losing quality?",
+    "options": ["Plastic", "Paper", "Glass"],
+    "correctAnswer": "Glass",
+    "explanation": "Unlike plastic and paper, glass and aluminum can be recycled forever!"
+  },
+  {
+    "id": 5,
+    "question": "What do we call hazardous plastic fragments smaller than 5 millimeters?",
+    "options": ["Mini-plastics", "Microplastics", "Nano-waste"],
+    "correctAnswer": "Microplastics",
+    "explanation": "Microplastics pollute oceans and even enter our food chain."
+  },
+  {
+    "id": 6,
+    "question": "What does the number '1' inside the recycling triangle on a water bottle mean?",
+    "options": ["Recycle once", "PET plastic", "Number 1 Quality"],
+    "correctAnswer": "PET plastic",
+    "explanation": "Number 1 indicates Polyethylene Terephthalate (PET), the most common plastic for beverages."
+  }
+]

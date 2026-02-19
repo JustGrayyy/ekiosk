@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import KioskButton from "../KioskButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { playSuccessSound, playErrorSound } from "@/lib/soundUtils";
+import { PostDepositModal } from "../PostDepositModal";
 
 interface CountingScreenProps {
   onDone: (count: number) => void;
@@ -18,6 +19,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
   const scanningRef = useRef(false);
   const [lastScannedCode, setLastScannedCode] = useState<string | null>(null);
   const [lastScanTime, setLastScanTime] = useState(0);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   useEffect(() => {
     if (hiddenInputRef.current) {
@@ -183,10 +185,19 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
       </motion.div>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.3 }}>
-        <KioskButton onClick={() => onDone(count)} size="medium" className={count > 0 ? "animate-pulse-glow" : ""}>
+        <KioskButton onClick={() => count > 0 ? setShowPostModal(true) : onDone(count)} size="medium" className={count > 0 ? "animate-pulse-glow" : ""}>
           DONE
         </KioskButton>
       </motion.div>
+
+      <AnimatePresence>
+        {showPostModal && (
+          <PostDepositModal
+            userLrn={userLrn}
+            onClose={() => onDone(count)}
+          />
+        )}
+      </AnimatePresence>
 
       <motion.p
         className="text-muted-foreground text-[8px] sm:text-[10px] md:text-xs text-center max-w-[200px] sm:max-w-xs"
