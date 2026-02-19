@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "react-query";
+import { motion } from "framer-motion";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -27,16 +27,17 @@ const AdminAnalytics: React.FC = () => {
             acc[curr.feeling] = (acc[curr.feeling] || 0) + 1;
             return acc;
           }, {});
-          setSentimentData(Object.entries(counts).map(([name, value]) => ({ name, value })));
+          const formatted = Object.entries(counts).map(([name, value]) => ({ name, value }));
+          setSentimentData(formatted.length > 0 ? formatted : [{ name: "No Data", value: 1 }]);
         }
 
         if (triviaRes.data) {
           const correct = triviaRes.data.filter((t: any) => t.is_correct).length;
           const incorrect = triviaRes.data.length - correct;
-          setTriviaData([
+          setTriviaData(triviaRes.data.length > 0 ? [
             { name: "Correct", value: correct },
             { name: "Incorrect", value: incorrect }
-          ]);
+          ] : [{ name: "No Data", value: 1 }]);
         }
       } catch (err) {
         console.error("Error fetching analytics:", err);
