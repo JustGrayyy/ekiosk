@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { QrCode, Printer, Download } from "lucide-react";
+import { QrCode, Download } from "lucide-react";
 import QRCode from "react-qr-code";
 import * as htmlToImage from "html-to-image";
 import KioskButton from "../KioskButton";
 import RedeemModal from "./RedeemModal";
 import QrScannerModal from "../QrScannerModal";
 import StartScreen from "./StartScreen";
-import { GlobalEnvironmentalImpact } from "../GlobalEnvironmentalImpact";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { playErrorSound } from "@/lib/soundUtils";
 
 interface CheckPointsScreenProps {
   onBack: () => void;
@@ -40,6 +40,7 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
 
   const handleSearch = async () => {
     if (!lrn.trim()) {
+      playErrorSound();
       setError("Please enter an LRN");
       return;
     }
@@ -62,10 +63,17 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
       if (data) {
         setStudentData(data);
       } else {
+        playErrorSound();
         setError("Student not found");
+        const panel = document.querySelector(".kiosk-panel");
+        if (panel) {
+          panel.classList.add("shake");
+          setTimeout(() => panel.classList.remove("shake"), 400);
+        }
       }
     } catch (err) {
       console.error("Error fetching student:", err);
+      playErrorSound();
       toast({
         title: "Error",
         description: "Failed to fetch student data. Please try again.",
@@ -100,7 +108,6 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
   const handleQrScan = useCallback(async (scannedLrn: string) => {
     setLrn(scannedLrn);
     setShowQrScanner(false);
-    // Auto-trigger search with the scanned LRN
     setLoading(true);
     setError("");
     setStudentData(null);
@@ -114,10 +121,17 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
       if (data) {
         setStudentData(data);
       } else {
+        playErrorSound();
         setError("Student not found");
+        const panel = document.querySelector(".kiosk-panel");
+        if (panel) {
+          panel.classList.add("shake");
+          setTimeout(() => panel.classList.remove("shake"), 400);
+        }
       }
     } catch (err) {
       console.error("Error fetching student:", err);
+      playErrorSound();
       toast({
         title: "Error",
         description: "Failed to fetch student data. Please try again.",
@@ -169,8 +183,6 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
       >
         CHECK YOUR POINTS
       </motion.h2>
-
-      {isStudentPortal && <GlobalEnvironmentalImpact />}
 
       {!studentData ? (
         <>

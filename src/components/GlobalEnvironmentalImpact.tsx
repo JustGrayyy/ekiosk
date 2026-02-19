@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Leaf, Globe, Target } from "lucide-react";
 import { useGlobalStats } from "@/hooks/useGlobalStats";
-import { Progress } from "@/components/ui/progress";
 
 export const GlobalEnvironmentalImpact = () => {
   const { data: stats, isLoading } = useGlobalStats();
@@ -49,7 +48,7 @@ export const GlobalEnvironmentalImpact = () => {
             ENVIRONMENTAL IMPACT
           </h3>
           <p className="text-foreground/90 text-sm sm:text-base md:text-lg leading-relaxed">
-            We have prevented <span className="text-primary font-bold kiosk-glow">{stats.co2Offset.toFixed(2)} kg</span> of CO2 from entering the atmosphere!
+            We have prevented an estimated <span className="text-primary font-bold kiosk-glow">{stats.co2Offset.toFixed(2)} kg</span> of CO2 from entering the atmosphere!
           </p>
         </div>
       </motion.div>

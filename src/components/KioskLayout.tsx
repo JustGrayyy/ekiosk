@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import KioskLogo from "./KioskLogo";
 import citySilhouette from "@/assets/city-silhouette.jpg";
+import { SuggestionBox } from "./SuggestionBox";
 
 interface KioskLayoutProps {
   children: ReactNode;
@@ -39,6 +40,7 @@ const KioskLayout = ({ children, showLogo = true }: KioskLayoutProps) => {
             {children}
           </motion.div>
         </AnimatePresence>
+        <SuggestionBox />
       </div>
     </div>
   );

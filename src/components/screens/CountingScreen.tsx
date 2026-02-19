@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import KioskButton from "../KioskButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { playSuccessSound, playErrorSound } from "@/lib/soundUtils";
 
 interface CountingScreenProps {
   onDone: (count: number) => void;
@@ -90,12 +91,24 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         }
 
         if (!product) {
+          playErrorSound();
+          const display = document.querySelector(".kiosk-display");
+          if (display) {
+            display.classList.add("shake");
+            setTimeout(() => display.classList.remove("shake"), 400);
+          }
           toast({ title: "Unknown Item", description: "This barcode is not in our system.", variant: "destructive" });
           return;
         }
 
         const p = product as any;
         if (p.category !== "bottle") {
+          playErrorSound();
+          const display = document.querySelector(".kiosk-display");
+          if (display) {
+            display.classList.add("shake");
+            setTimeout(() => display.classList.remove("shake"), 400);
+          }
           toast({
             title: "Rejected",
             description: `${p.name} is not a bottle.`,
@@ -104,6 +117,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         }
 
         // Valid bottle
+        playSuccessSound();
         setCount((prev) => prev + 1);
         toast({ title: "Accepted", description: `${p.name} (+1 Point)` });
         syncPointToDatabase();

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import KioskButton from "../KioskButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { playSuccessSound, playErrorSound } from "@/lib/soundUtils";
 
 interface RedeemModalProps {
   studentLrn: string;
@@ -52,6 +53,7 @@ const RedeemModal = ({
 
   const handleRedeem = async (reward: Reward) => {
     if (currentBalance < reward.cost) {
+      playErrorSound();
       toast({
         title: "Insufficient Points",
         description: `You need ${reward.cost - currentBalance} more points for this reward.`,
@@ -79,6 +81,7 @@ const RedeemModal = ({
         points_redeemed: reward.cost,
       });
 
+      playSuccessSound();
       const code = generateClaimCode();
       setClaimCode(code);
       setRedeemedReward(reward);

@@ -63,5 +63,5 @@ export function findClosestSection(
     return { corrected: bestMatch, wasAutoCorrected: true };
   }
 
-  return { corrected: input.trim(), wasAutoCorrected: false };
+  return { corrected: "", wasAutoCorrected: false };
 }

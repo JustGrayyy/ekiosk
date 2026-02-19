@@ -13,9 +13,11 @@ import LiveFeedTable from "@/components/admin/LiveFeedTable";
 import SectionRankingsChart from "@/components/admin/SectionRankingsChart";
 import ProductListTable from "@/components/admin/ProductListTable";
 import AddProductForm from "@/components/admin/AddProductForm";
+import SuggestionTable from "@/components/admin/SuggestionTable";
 
 const CHARTS = [
   { title: "Live Feed", Component: LiveFeedTable },
+  { title: "Student Suggestions", Component: SuggestionTable },
   { title: "Section Rankings", Component: SectionRankingsChart },
   { title: "Daily Scan Velocity", Component: DailyScanChart },
   { title: "Top 5 Contributors", Component: TopContributorsChart },

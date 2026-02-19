@@ -6,6 +6,7 @@ import QrScannerModal from "../QrScannerModal";
 import { findClosestSection, VALID_SECTIONS } from "@/lib/fuzzyMatch";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { playErrorSound } from "@/lib/soundUtils";
 
 interface AccountScreenProps {
   onSubmit: (name: string, lrn: string, section: string) => void;
@@ -32,11 +33,15 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
       });
     } else if (corrected) {
       setSection(corrected);
+    } else {
+      playErrorSound();
+      setError("SECTION NOT FOUND - PLEASE CHECK SPELLING");
     }
   };
 
   const handleLrnSubmit = async (targetLrn: string) => {
     if (!targetLrn.trim()) {
+      playErrorSound();
       setError("Please enter your LRN");
       return;
     }
@@ -64,6 +69,7 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
       }
     } catch (err) {
       console.error("Error checking LRN:", err);
+      playErrorSound();
       toast({
         title: "Error",
         description: "Failed to verify LRN. Please try again.",
@@ -76,10 +82,12 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
 
   const handleManualSubmit = () => {
     if (!name.trim()) {
+      playErrorSound();
       setError("Please enter your name");
       return;
     }
     if (!lrn.trim()) {
+      playErrorSound();
       setError("Please enter your LRN");
       return;
     }
@@ -95,6 +103,7 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
 
   const handleQrScan = useCallback(async (scannedLrn: string) => {
     if (!/^\d+$/.test(scannedLrn)) {
+      playErrorSound();
       toast({
         title: "Invalid LRN",
         description: "Only numeric LRNs are accepted.",
@@ -116,7 +125,7 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="kiosk-panel rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10">
+      <div className={`kiosk-panel rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 ${error ? "shake" : ""}`}>
         <motion.h2
           className="text-primary text-center text-xs sm:text-sm md:text-base lg:text-xl mb-4 sm:mb-6 md:mb-8 leading-relaxed"
           initial={{ opacity: 0 }}
@@ -137,7 +146,7 @@ const AccountScreen = ({ onSubmit }: AccountScreenProps) => {
                 disabled={loading}
                 onChange={(e) => handleLrnChange(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !showRegistration && handleLrnSubmit(lrn)}
-                className="w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 pr-12 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px] disabled:opacity-70"
+                className={`w-full kiosk-input rounded-lg px-3 sm:px-4 py-3 sm:py-4 pr-12 text-foreground text-sm sm:text-base md:text-lg outline-none transition-all min-h-[44px] disabled:opacity-70 ${error ? "border-destructive" : ""}`}
                 placeholder="Enter or Scan LRN"
                 maxLength={12}
               />

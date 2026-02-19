@@ -5,8 +5,6 @@ export const useGlobalStats = () => {
   return useQuery({
     queryKey: ["global-stats"],
     queryFn: async () => {
-      // Fetch total items scanned by counting rows in scan_logs
-      // We use count: 'exact' to get the total number of rows efficiently
       const { count, error } = await supabase
         .from("scan_logs")
         .select("*", { count: "exact", head: true });
@@ -15,7 +13,8 @@ export const useGlobalStats = () => {
       
       const totalItems = count || 0;
       const goal = 5000;
-      const co2Offset = totalItems * 0.08;
+      // Formula: (totalBottles * 0.015) * 0.538
+      const co2Offset = (totalItems * 0.015) * 0.538;
       const progress = Math.min((totalItems / goal) * 100, 100);
 
       return {
@@ -25,6 +24,7 @@ export const useGlobalStats = () => {
         progress,
       };
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 10000,
+    refetchInterval: 30000,
   });
 };

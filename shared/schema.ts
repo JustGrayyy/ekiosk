@@ -32,3 +32,9 @@ export const allowedProducts = pgTable("allowed_products", {
   category: text("category").notNull().default("bottle"),
   pointsValue: integer("points_value").notNull().default(1),
 });
+
+export const suggestions = pgTable("suggestions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});

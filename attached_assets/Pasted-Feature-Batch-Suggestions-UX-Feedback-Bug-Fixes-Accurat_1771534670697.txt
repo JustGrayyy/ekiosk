@@ -1,0 +1,24 @@
+Feature Batch: Suggestions, UX Feedback, Bug Fixes, & Accurate Math
+Context:
+I need to add a suggestion system, fix a duplication bug on the student portal, add sensory feedback to the kiosk, and update the environmental math to be scientifically accurate.
+Task 1: Fix the "Doubled" Dashboard Bug
+• The Issue: The School Goal Progress Bar and CO2 Dashboard are showing up twice (doubled) on the /student-portal page.
+• The Fix: Please inspect StudentPortal.tsx (or the relevant routing file). Remove any duplicate imports or duplicate renderings of the GlobalStats or Dashboard components. Ensure it only renders once at the top of the page. Check the data fetching hook to ensure it's not accidentally adding the state together twice.
+Task 2: Suggestion Box System
+• UI (Student & Kiosk): Add a floating or prominently placed "Feedback & Suggestions" button on both the Main Kiosk (/) and Student Portal (/student-portal).
+• Action: Clicking it opens a simple modal with a textarea for the suggestion. No login required.
+• Database: Save this to a new suggestions table in Supabase (columns: id, message, created_at).
+• Admin Portal: Add a "Suggestions" tab or section in the Admin Dashboard that fetches from this table so the admin can read what students are asking for and delete them once read.
+Task 3: Haptic, Visual & Audio Feedback
+• Visual Error (Shake): Create a CSS @keyframes animation for a quick horizontal "shake". Apply this .shake class temporarily to the input field or card whenever an error occurs (e.g., "Student Not Found" or "Insufficient Points").
+• Audio Feedback: In the functions that handle scanning/depositing and redeeming, implement simple audio feedback using the browser's Audio API.
+• Success ("Ching!"): Play a positive, high-pitch success sound when points are successfully added or an item is redeemed.
+• Error ("Thump"): Play a low-pitch error sound when a scan fails or points are insufficient.
+• Note: Create a utility file (e.g., soundUtils.ts) that uses the Web Audio API (oscillators) to synthesize these two sounds so I don't have to upload MP3 files immediately. A bright "ding" for success, and a dull "buzz/thump" for error.
+Task 4: Update CO2 Math Formula
+• The Metric: The new scientific metric is 0.538 kg of CO2 saved per 1 kg of PET bottles.
+• The Assumption: Assume the average plastic bottle weighs 15 grams (0.015 kg).
+• The Code Update: Locate the CO2 calculation in the GlobalStats component. Change the math to exactly this:
+const co2Saved = (totalBottles * 0.015) * 0.538;
+• UI Format: Format the result to 2 decimal places (e.g., 12.45 kg CO2).
+• Add the word “estimated”
