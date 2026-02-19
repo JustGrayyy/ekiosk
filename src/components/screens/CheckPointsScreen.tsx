@@ -7,6 +7,7 @@ import KioskButton from "../KioskButton";
 import RedeemModal from "./RedeemModal";
 import QrScannerModal from "../QrScannerModal";
 import StartScreen from "./StartScreen";
+import { GlobalEnvironmentalImpact } from "../GlobalEnvironmentalImpact";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -169,6 +170,8 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
         CHECK YOUR POINTS
       </motion.h2>
 
+      {isStudentPortal && <GlobalEnvironmentalImpact />}
+
       {!studentData ? (
         <>
           <motion.div
@@ -310,7 +313,7 @@ const CheckPointsScreen = ({ onBack, isStudentPortal = false }: CheckPointsScree
         />
       )}
 
-      {isStudentPortal && (
+      {isStudentPortal && !studentData && (
         <div className="w-full mt-8 border-t border-primary/20 pt-8 flex flex-col items-center gap-8">
           <StartScreen 
             onStart={() => {}} 

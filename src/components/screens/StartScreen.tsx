@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Trophy, Users } from "lucide-react";
 import FunFactCard from "../FunFactCard";
 import KioskButton from "../KioskButton";
+import { GlobalEnvironmentalImpact } from "../GlobalEnvironmentalImpact";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StartScreenProps {
@@ -70,6 +71,8 @@ const StartScreen = ({ onStart, onCheckPoints, isStudentPortal = false }: StartS
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.4 }}
     >
+      <GlobalEnvironmentalImpact />
+
       {!isStudentPortal && (
         <motion.p
           className="text-foreground/70 text-[10px] sm:text-xs md:text-sm lg:text-base text-center max-w-xs sm:max-w-sm md:max-w-md px-2"
