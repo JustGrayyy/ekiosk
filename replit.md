@@ -82,20 +82,11 @@ Preferred communication style: Simple, everyday language.
 - Google Fonts: Space Grotesk (loaded via CSS import in `src/index.css`)
 
 ## Recent Changes
-- **2026-02-20**: Completely reworked Admin Dashboard analytics and logic.
-  - Implemented `fetchAllAnalytics` with centralized fetching for `suggestions`, `trivia_logs`, and `sentiment_logs`.
-  - Added robust error reporting for Supabase fetches to identify RLS issues.
-  - Reworked Data Transformation:
+- **2026-02-20**: Master Rework of Admin Dashboard Analytics & Logic.
+  - Centralized data fetching in `AdminAnalytics` with `fetchAllAnalytics` for `suggestions`, `trivia_logs`, and `sentiment_logs`.
+  - Implemented precise data transformation:
     - Sentiment: Aggregates 'Happy', 'Proud', and 'Neutral' counts for Recharts.
     - Trivia: Aggregates 'Correct' vs 'Incorrect' counts based on `is_correct` boolean.
-  - Enhanced Suggestion List:
-    - Added sorting (newest first).
-    - Implemented "Delete" functionality with automatic list refresh.
-    - Improved UI with cleaner styling and loading states.
-- **2026-02-20**: Updated admin dashboard to correctly display suggestions and analytics data.
-  - Refactored AdminAnalytics component to correctly fetch and format data for trivia and sentiment charts.
-  - Updated SuggestionBox and SuggestionTable to use plural table names for suggestions.
-- **2026-02-20**: Master Rework of Admin Dashboard Analytics & Logic.
-  - Centralized data fetching in `AdminAnalytics` for better performance and error handling.
-  - Implemented precise data transformation for sentiment and trivia charts.
-  - Added delete and auto-refresh functionality to the suggestion management table.
+  - Enhanced Suggestion Management:
+    - Added newest-first sorting and manual delete functionality with auto-refresh.
+  - Added robust Supabase error reporting to identify RLS or connection issues.
