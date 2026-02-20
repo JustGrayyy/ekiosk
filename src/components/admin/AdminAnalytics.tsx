@@ -34,13 +34,13 @@ const AdminAnalytics: React.FC = () => {
           const expectedFeelings = ['Happy', 'Proud', 'Neutral'];
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
             const feeling = curr.feeling;
-            if (expectedFeelings.includes(feeling)) {
+            if (feeling && expectedFeelings.includes(feeling)) {
               acc[feeling] = (acc[feeling] || 0) + 1;
             }
             return acc;
           }, {});
           
-          // Data format for PieChart: [{ name: 'Happy', value: 10 }, { name: 'Proud', value: 15 }]
+          // Count total number of 'Happy', 'Proud', and 'Neutral' responses
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
@@ -50,14 +50,15 @@ const AdminAnalytics: React.FC = () => {
 
         if (triviaRes.data) {
           const total = triviaRes.data.length;
+          // Calculate the percentage of is_correct === true vs false
           const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
           const incorrectCount = total - correctCount;
           
-          // Data format for success rate chart
-          setTriviaData([
+          const formatted = [
             { name: "Correct", value: correctCount },
             { name: "Incorrect", value: incorrectCount }
-          ]);
+          ];
+          setTriviaData(formatted);
         }
       } catch (err: any) {
         console.error("Error fetching admin data:", err);

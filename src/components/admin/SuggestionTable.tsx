@@ -17,14 +17,14 @@ const SuggestionTable: React.FC = () => {
   const fetchSuggestions = async () => {
     try {
       setLoading(true);
-      // Fetching from 'suggestions' table for admin dashboard
+      // Fetching from 'suggestions' plural table
       const { data, error } = await supabase
         .from("suggestions")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Supabase fetch error for suggestions:", error);
+        console.error("Error fetching from suggestions table:", error);
         throw error;
       }
       setSuggestions(data || []);
