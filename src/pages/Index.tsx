@@ -24,6 +24,7 @@ const Index = ({ isStudentPortal = false }: IndexProps) => {
   const [currentScreen, setCurrentScreen] = useState<Screen>(isStudentPortal ? "checkPoints" : "start");
   const [userData, setUserData] = useState<UserData>({ name: "", lrn: "", section: "" });
   const [depositCount, setDepositCount] = useState(0);
+  const [triviaBonus, setTriviaBonus] = useState(0);
 
   const handleStart = useCallback(() => {
     if (isStudentPortal) return;
@@ -49,9 +50,10 @@ const Index = ({ isStudentPortal = false }: IndexProps) => {
     setCurrentScreen("counting");
   }, [isStudentPortal]);
 
-  const handleCountingDone = useCallback((count: number) => {
+  const handleCountingDone = useCallback((count: number, bonus: number = 0) => {
     if (isStudentPortal) return;
     setDepositCount(count);
+    setTriviaBonus(bonus);
     setCurrentScreen("success");
   }, [isStudentPortal]);
 
@@ -59,6 +61,7 @@ const Index = ({ isStudentPortal = false }: IndexProps) => {
     // Reset all state and go back to start
     setUserData({ name: "", lrn: "", section: "" });
     setDepositCount(0);
+    setTriviaBonus(0);
     setCurrentScreen(isStudentPortal ? "checkPoints" : "start");
   }, [isStudentPortal]);
 
@@ -75,7 +78,7 @@ const Index = ({ isStudentPortal = false }: IndexProps) => {
       case "counting":
         return <CountingScreen key="counting" onDone={handleCountingDone} userLrn={userData.lrn} userName={userData.name} userSection={userData.section} />;
       case "success":
-        return <SuccessScreen key="success" onComplete={handleComplete} depositCount={depositCount} pointsEarned={depositCount} />;
+        return <SuccessScreen key="success" onComplete={handleComplete} depositCount={depositCount} pointsEarned={depositCount} triviaBonus={triviaBonus} />;
       default:
         return <StartScreen key="start" onStart={handleStart} onCheckPoints={handleCheckPoints} isStudentPortal={isStudentPortal} />;
     }

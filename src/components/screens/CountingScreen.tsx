@@ -7,7 +7,7 @@ import { playSuccessSound, playErrorSound } from "@/lib/soundUtils";
 import { PostDepositModal } from "../PostDepositModal";
 
 interface CountingScreenProps {
-  onDone: (count: number) => void;
+  onDone: (count: number, bonus: number) => void;
   userLrn: string;
   userName: string;
   userSection: string;
@@ -16,11 +16,18 @@ interface CountingScreenProps {
 const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScreenProps) => {
   const [count, setCount] = useState(0);
   const [pointsBalance, setPointsBalance] = useState(0);
+  const [triviaBonus, setTriviaBonus] = useState(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const scanningRef = useRef(false);
   const [lastScannedCode, setLastScannedCode] = useState<string | null>(null);
   const [lastScanTime, setLastScanTime] = useState(0);
   const [showPostModal, setShowPostModal] = useState(false);
+
+  const handlePostModalClose = (bonusEarned: boolean) => {
+    const bonus = bonusEarned ? 1 : 0;
+    setTriviaBonus(bonus);
+    onDone(count, bonus); 
+  };
 
   useEffect(() => {
     // Fetch initial points balance
@@ -39,7 +46,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
     if (count > 0) {
       setShowPostModal(true);
     } else {
-      onDone(count);
+      onDone(count, 0);
     }
   };
 
@@ -218,7 +225,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
           <PostDepositModal
             userLrn={userLrn}
             currentPoints={pointsBalance}
-            onClose={() => onDone(count)}
+            onClose={handlePostModalClose}
           />
         )}
       </AnimatePresence>

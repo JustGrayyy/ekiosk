@@ -53,7 +53,7 @@ const TRIVIA_QUESTIONS = [
 
 interface PostDepositModalProps {
   userLrn: string;
-  onClose: () => void;
+  onClose: (bonusEarned: boolean) => void;
   currentPoints: number;
 }
 
@@ -88,10 +88,10 @@ export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onC
       }
       playSuccessSound();
       toast({ title: "Thanks for sharing!", description: "Every action counts." });
-      onClose();
+      onClose(false);
     } catch (err: any) {
       console.error("Sentiment error:", err.message);
-      onClose();
+      onClose(false);
     }
   };
 
@@ -105,12 +105,14 @@ export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onC
     try {
       // Task 2: Fix trivia_logs insertion (no .select() or .single())
       const { error: insertError } = await supabase.from("trivia_logs" as any).insert([{
-        question_id: trivia.id,
         is_correct: correct
       }]);
       
       if (insertError) {
         console.error("Trivia log insert error:", insertError.message);
+        toast({ title: "Log Error", description: insertError.message, variant: "destructive" });
+      } else {
+        console.log("Trivia Log Saved");
       }
 
       if (correct) {
@@ -130,10 +132,10 @@ export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onC
       }
 
       // Keep result visible for 3 seconds then close
-      setTimeout(onClose, 3000);
+      setTimeout(() => onClose(correct), 3000);
     } catch (err: any) {
       console.error("Trivia workflow error:", err.message);
-      setTimeout(onClose, 3000);
+      setTimeout(() => onClose(false), 3000);
     }
   };
 

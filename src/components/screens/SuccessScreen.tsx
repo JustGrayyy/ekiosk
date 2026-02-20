@@ -6,9 +6,10 @@ interface SuccessScreenProps {
   onComplete: () => void;
   depositCount: number;
   pointsEarned: number;
+  triviaBonus?: number;
 }
 
-const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreenProps) => {
+const SuccessScreen = ({ onComplete, depositCount, pointsEarned, triviaBonus = 0 }: SuccessScreenProps) => {
   useEffect(() => {
     // Auto-redirect after 5 seconds
     const timeout = setTimeout(() => {
@@ -72,8 +73,13 @@ const SuccessScreen = ({ onComplete, depositCount, pointsEarned }: SuccessScreen
             ITEMS DEPOSITED: {depositCount}
           </p>
           <p className="text-primary-foreground text-[10px] sm:text-xs md:text-sm font-bold">
-            POINTS EARNED: +{pointsEarned}
+            POINTS EARNED: +{pointsEarned} {triviaBonus > 0 && `+ ${triviaBonus} Bonus Point!`}
           </p>
+          {triviaBonus > 0 && (
+            <p className="text-amber-400 text-[10px] sm:text-xs md:text-sm font-bold animate-bounce">
+              NEW TOTAL: {pointsEarned + triviaBonus}
+            </p>
+          )}
         </motion.div>
       </motion.div>
 

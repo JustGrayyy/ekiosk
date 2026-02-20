@@ -8,6 +8,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Smile, Trophy, MessageSquare, AlertCircle } from "lucide-react";
 import SuggestionTable from "./SuggestionTable";
+import { toast } from "@/hooks/use-toast";
 
 const AdminAnalytics: React.FC = () => {
   const [sentimentData, setSentimentData] = useState<any[]>([]);
@@ -18,7 +19,7 @@ const AdminAnalytics: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log("Fetching analytics data...");
+        console.log("Fetching Admin Data...");
         const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
           supabase.from("sentiment_logs" as any).select("*"),
           supabase.from("trivia_logs" as any).select("*"),
@@ -29,13 +30,18 @@ const AdminAnalytics: React.FC = () => {
         console.log("Trivia count:", triviaRes.data?.length);
         console.log("Suggestions count:", suggestionsRes.data?.length);
 
+        if (sentimentRes.error) throw new Error(`Sentiment Error: ${sentimentRes.error.message}`);
+        if (triviaRes.error) throw new Error(`Trivia Error: ${triviaRes.error.message}`);
+        if (suggestionsRes.error) throw new Error(`Suggestions Error: ${suggestionsRes.error.message}`);
+
         if (sentimentRes.data) {
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
-            acc[curr.feeling] = (acc[curr.feeling] || 0) + 1;
+            const feeling = curr.feeling || "Unknown";
+            acc[feeling] = (acc[feeling] || 0) + 1;
             return acc;
           }, {});
           const formatted = Object.entries(counts).map(([name, value]) => ({ name, value }));
-          setSentimentData(formatted.length > 0 ? formatted : []);
+          setSentimentData(formatted);
         }
 
         if (triviaRes.data) {
@@ -46,8 +52,13 @@ const AdminAnalytics: React.FC = () => {
             { name: "Incorrect", value: incorrect }
           ] : []);
         }
-      } catch (err) {
-        console.error("Error fetching analytics:", err);
+      } catch (err: any) {
+        console.error("Error fetching admin data:", err);
+        toast({
+          title: "Admin Sync Error",
+          description: err.message,
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
