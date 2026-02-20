@@ -13,6 +13,10 @@ import LiveFeedTable from "@/components/admin/LiveFeedTable";
 import SectionRankingsChart from "@/components/admin/SectionRankingsChart";
 import ProductListTable from "@/components/admin/ProductListTable";
 import AddProductForm from "@/components/admin/AddProductForm";
+import SentimentChart from "@/components/admin/SentimentChart";
+import TriviaChart from "@/components/admin/TriviaChart";
+import SuggestionList from "@/components/admin/SuggestionList";
+import { useAdminAnalytics } from "@/hooks/useAdminAnalytics";
 
 const CHARTS = [
   { title: "Live Feed", Component: LiveFeedTable },
@@ -27,8 +31,15 @@ const CHARTS = [
   { title: "Register New Item", Component: AddProductForm },
 ];
 
+const ANALYTICS_PANELS = [
+  { title: "Sentiment Overview", key: "sentiment" },
+  { title: "Trivia Results", key: "trivia" },
+  { title: "Suggestion Box", key: "suggestions" },
+] as const;
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { sentimentLogs, triviaLogs, suggestions, loading: analyticsLoading, error: analyticsError, refetch } = useAdminAnalytics();
 
   useEffect(() => {
     if (sessionStorage.getItem("admin_session") !== "valid") {
@@ -39,6 +50,25 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     sessionStorage.removeItem("admin_session");
     navigate("/");
+  };
+
+  const renderAnalyticsPanel = (key: string) => {
+    if (analyticsLoading) {
+      return <div className="text-muted-foreground text-xs text-center p-4">Loading...</div>;
+    }
+    if (analyticsError) {
+      return <div className="text-destructive text-[10px] text-center p-4">{analyticsError}</div>;
+    }
+    switch (key) {
+      case "sentiment":
+        return <SentimentChart data={sentimentLogs} />;
+      case "trivia":
+        return <TriviaChart data={triviaLogs} />;
+      case "suggestions":
+        return <SuggestionList data={suggestions} onRefetch={refetch} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -70,6 +100,20 @@ const AdminDashboard = () => {
           >
             <h2 className="text-primary text-[9px] sm:text-[10px] md:text-xs mb-3 kiosk-glow">{title.toUpperCase()}</h2>
             <Component />
+          </motion.div>
+        ))}
+
+        {/* Analytics panels fed by useAdminAnalytics */}
+        {ANALYTICS_PANELS.map(({ title, key }, i) => (
+          <motion.div
+            key={key}
+            className="kiosk-panel rounded-xl p-3 sm:p-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: (CHARTS.length + i) * 0.1 }}
+          >
+            <h2 className="text-primary text-[9px] sm:text-[10px] md:text-xs mb-3 kiosk-glow">{title.toUpperCase()}</h2>
+            {renderAnalyticsPanel(key)}
           </motion.div>
         ))}
       </div>
