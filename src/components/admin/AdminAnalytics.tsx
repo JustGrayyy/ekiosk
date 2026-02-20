@@ -21,14 +21,14 @@ const AdminAnalytics: React.FC = () => {
         setLoading(true);
         console.log("Fetching Centralized Analytics Data...");
         
-        // Centralized Fetch from suggestions, trivia_logs, and sentiment_logs
+        // Centralized Fetch: Query suggestions, trivia_logs, and sentiment_logs
         const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
           supabase.from("sentiment_logs").select("*"),
           supabase.from("trivia_logs").select("*"),
           supabase.from("suggestions").select("*")
         ]);
 
-        // Error Reporting with specific Supabase error messages
+        // Error Reporting: Specific Supabase error messages for debugging RLS/connection issues
         if (sentimentRes.error) {
           console.error("Supabase Sentiment Fetch Error:", sentimentRes.error.message, sentimentRes.error.details);
           throw new Error(`Sentiment: ${sentimentRes.error.message}`);
@@ -42,7 +42,7 @@ const AdminAnalytics: React.FC = () => {
           throw new Error(`Suggestions: ${suggestionsRes.error.message}`);
         }
 
-        // Sentiment Data Transformation (Crucial)
+        // Sentiment Data Transformation (Crucial for Recharts)
         if (sentimentRes.data) {
           const expectedFeelings = ['Happy', 'Proud', 'Neutral'];
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
@@ -53,7 +53,7 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           
-          // Output Format: [{ name: 'Happy', value: 10 }, { name: 'Proud', value: 5 }, { name: 'Neutral', value: 2 }]
+          // Output Format: [{ name: 'Happy', value: X }, { name: 'Proud', value: Y }, { name: 'Neutral', value: Z }]
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
@@ -61,14 +61,14 @@ const AdminAnalytics: React.FC = () => {
           setSentimentData(formatted);
         }
 
-        // Trivia Data Transformation (Crucial)
+        // Trivia Data Transformation (Crucial for Success vs. Failure visualization)
         if (triviaRes.data) {
           const total = triviaRes.data.length;
           // Logic: Count total rows where is_correct is true vs. false
           const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
           const incorrectCount = total - correctCount;
           
-          // Output Format: [{ name: 'Correct', value: 25 }, { name: 'Incorrect', value: 10 }]
+          // Output Format: [{ name: 'Correct', value: A }, { name: 'Incorrect', value: B }]
           setTriviaData([
             { name: "Correct", value: correctCount },
             { name: "Incorrect", value: incorrectCount }

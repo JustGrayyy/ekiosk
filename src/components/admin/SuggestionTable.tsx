@@ -17,14 +17,14 @@ const SuggestionTable: React.FC = () => {
   const fetchSuggestions = async () => {
     try {
       setLoading(true);
-      // Fetching from 'suggestions' plural table with explicit sorting
+      // Centralized Fetch: suggestions table with newest first sorting
       const { data, error } = await supabase
         .from("suggestions")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching from suggestions table:", error.message, error.details);
+        console.error("Supabase Suggestions Fetch Error:", error.message, error.details);
         throw error;
       }
       setSuggestions(data || []);
@@ -41,20 +41,20 @@ const SuggestionTable: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      // Delete call using Supabase
+      // Logic: Delete specific suggestion by ID
       const { error } = await supabase
         .from("suggestions")
         .delete()
         .eq("id", id);
 
       if (error) {
-        console.error("Delete Error:", error.message);
+        console.error("Supabase Delete Error:", error.message);
         throw error;
       }
       
-      // Refresh list after deletion
+      // Feature: Refresh the list immediately after a successful delete
       await fetchSuggestions();
-      toast({ title: "Deleted", description: "Suggestion removed and list refreshed." });
+      toast({ title: "Deleted", description: "Suggestion removed and list updated." });
     } catch (error) {
       toast({ title: "Error", description: "Failed to delete suggestion.", variant: "destructive" });
     }
