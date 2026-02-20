@@ -16,20 +16,33 @@ const AdminAnalytics: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllAnalytics = async () => {
       try {
         setLoading(true);
-        console.log("Fetching Admin Data...");
+        console.log("Fetching Centralized Analytics Data...");
+        
+        // Centralized Fetch from suggestions, trivia_logs, and sentiment_logs
         const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
           supabase.from("sentiment_logs").select("*"),
           supabase.from("trivia_logs").select("*"),
           supabase.from("suggestions").select("*")
         ]);
 
-        if (sentimentRes.error) throw new Error(`Sentiment Error: ${sentimentRes.error.message}`);
-        if (triviaRes.error) throw new Error(`Trivia Error: ${triviaRes.error.message}`);
-        if (suggestionsRes.error) throw new Error(`Suggestions Error: ${suggestionsRes.error.message}`);
+        // Error Reporting with specific Supabase error messages
+        if (sentimentRes.error) {
+          console.error("Supabase Sentiment Fetch Error:", sentimentRes.error.message, sentimentRes.error.details);
+          throw new Error(`Sentiment: ${sentimentRes.error.message}`);
+        }
+        if (triviaRes.error) {
+          console.error("Supabase Trivia Fetch Error:", triviaRes.error.message, triviaRes.error.details);
+          throw new Error(`Trivia: ${triviaRes.error.message}`);
+        }
+        if (suggestionsRes.error) {
+          console.error("Supabase Suggestions Fetch Error:", suggestionsRes.error.message, suggestionsRes.error.details);
+          throw new Error(`Suggestions: ${suggestionsRes.error.message}`);
+        }
 
+        // Sentiment Data Transformation (Crucial)
         if (sentimentRes.data) {
           const expectedFeelings = ['Happy', 'Proud', 'Neutral'];
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
@@ -40,7 +53,7 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           
-          // Count total number of 'Happy', 'Proud', and 'Neutral' responses for the sentiment pie chart.
+          // Output Format: [{ name: 'Happy', value: 10 }, { name: 'Proud', value: 5 }, { name: 'Neutral', value: 2 }]
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
@@ -48,30 +61,31 @@ const AdminAnalytics: React.FC = () => {
           setSentimentData(formatted);
         }
 
+        // Trivia Data Transformation (Crucial)
         if (triviaRes.data) {
           const total = triviaRes.data.length;
-          // Calculate the percentage of is_correct === true vs false for the trivia success rate chart.
+          // Logic: Count total rows where is_correct is true vs. false
           const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
           const incorrectCount = total - correctCount;
           
-          const formatted = [
+          // Output Format: [{ name: 'Correct', value: 25 }, { name: 'Incorrect', value: 10 }]
+          setTriviaData([
             { name: "Correct", value: correctCount },
             { name: "Incorrect", value: incorrectCount }
-          ];
-          setTriviaData(formatted);
+          ]);
         }
       } catch (err: any) {
-        console.error("Error fetching admin data:", err);
+        console.error("Critical Admin Analytics Error:", err);
         toast({
-          title: "Admin Sync Error",
-          description: err.message,
+          title: "Dashboard Fetch Failed",
+          description: "Verify your RLS policies or database connection.",
           variant: "destructive"
         });
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchAllAnalytics();
   }, []);
 
   const COLORS = ["#10b981", "#f59e0b", "#3b82f6", "#ef4444"];
