@@ -81,4 +81,17 @@ Preferred communication style: Simple, everyday language.
 ### External Fonts
 - Google Fonts: Space Grotesk (loaded via CSS import in `src/index.css`)
 
-### No other external APIs or third-party service integrations are currently in use.
+## Recent Changes
+- **2026-02-20**: Completely reworked Admin Dashboard analytics and logic.
+  - Implemented `fetchAllAnalytics` with centralized fetching for `suggestions`, `trivia_logs`, and `sentiment_logs`.
+  - Added robust error reporting for Supabase fetches to identify RLS issues.
+  - Reworked Data Transformation:
+    - Sentiment: Aggregates 'Happy', 'Proud', and 'Neutral' counts for Recharts.
+    - Trivia: Aggregates 'Correct' vs 'Incorrect' counts based on `is_correct` boolean.
+  - Enhanced Suggestion List:
+    - Added sorting (newest first).
+    - Implemented "Delete" functionality with automatic list refresh.
+    - Improved UI with cleaner styling and loading states.
+- **2026-02-20**: Updated admin dashboard to correctly display suggestions and analytics data.
+  - Refactored AdminAnalytics component to correctly fetch and format data for trivia and sentiment charts.
+  - Updated SuggestionBox and SuggestionTable to use plural table names for suggestions.
