@@ -19,30 +19,30 @@ const AdminAnalytics: React.FC = () => {
     const fetchAllAnalytics = async () => {
       try {
         setLoading(true);
-        console.log("Fetching Centralized Analytics Data...");
+        console.log("Starting Master Rework: Fetching Centralized Analytics Data...");
         
-        // Centralized Fetch: Query suggestions, trivia_logs, and sentiment_logs
+        // Task 1: Complete Rework of Data Fetching (Centralized Fetch)
         const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
           supabase.from("sentiment_logs").select("*"),
           supabase.from("trivia_logs").select("*"),
           supabase.from("suggestions").select("*")
         ]);
 
-        // Error Reporting: Specific Supabase error messages for debugging RLS/connection issues
+        // Task 1: Error Reporting (Crucial for RLS debugging)
         if (sentimentRes.error) {
-          console.error("Supabase Sentiment Fetch Error:", sentimentRes.error.message, sentimentRes.error.details);
+          console.error("Supabase Sentiment Fetch Error (Check RLS):", sentimentRes.error.message, sentimentRes.error.details);
           throw new Error(`Sentiment: ${sentimentRes.error.message}`);
         }
         if (triviaRes.error) {
-          console.error("Supabase Trivia Fetch Error:", triviaRes.error.message, triviaRes.error.details);
+          console.error("Supabase Trivia Fetch Error (Check RLS):", triviaRes.error.message, triviaRes.error.details);
           throw new Error(`Trivia: ${triviaRes.error.message}`);
         }
         if (suggestionsRes.error) {
-          console.error("Supabase Suggestions Fetch Error:", suggestionsRes.error.message, suggestionsRes.error.details);
+          console.error("Supabase Suggestions Fetch Error (Check RLS):", suggestionsRes.error.message, suggestionsRes.error.details);
           throw new Error(`Suggestions: ${suggestionsRes.error.message}`);
         }
 
-        // Sentiment Data Transformation (Crucial for Recharts)
+        // Task 2: Data Transformation for Sentiment Chart
         if (sentimentRes.data) {
           const expectedFeelings = ['Happy', 'Proud', 'Neutral'];
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
@@ -53,32 +53,35 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           
-          // Output Format: [{ name: 'Happy', value: X }, { name: 'Proud', value: Y }, { name: 'Neutral', value: Z }]
+          // Output Format for Recharts: [{ name: 'Happy', value: 10 }, { name: 'Proud', value: 5 }, { name: 'Neutral', value: 2 }]
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
           }));
           setSentimentData(formatted);
+          console.log("Sentiment Transformation Complete:", formatted);
         }
 
-        // Trivia Data Transformation (Crucial for Success vs. Failure visualization)
+        // Task 2: Data Transformation for Trivia Chart (Success vs. Failure)
         if (triviaRes.data) {
           const total = triviaRes.data.length;
           // Logic: Count total rows where is_correct is true vs. false
           const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
           const incorrectCount = total - correctCount;
           
-          // Output Format: [{ name: 'Correct', value: A }, { name: 'Incorrect', value: B }]
-          setTriviaData([
+          // Output Format: [{ name: 'Correct', value: 25 }, { name: 'Incorrect', value: 10 }]
+          const triviaFormatted = [
             { name: "Correct", value: correctCount },
             { name: "Incorrect", value: incorrectCount }
-          ]);
+          ];
+          setTriviaData(triviaFormatted);
+          console.log("Trivia Transformation Complete:", triviaFormatted);
         }
       } catch (err: any) {
         console.error("Critical Admin Analytics Error:", err);
         toast({
           title: "Dashboard Fetch Failed",
-          description: "Verify your RLS policies or database connection.",
+          description: "Verify your RLS policies or database connection in the console.",
           variant: "destructive"
         });
       } finally {

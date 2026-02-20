@@ -17,17 +17,18 @@ const SuggestionTable: React.FC = () => {
   const fetchSuggestions = async () => {
     try {
       setLoading(true);
-      // Centralized Fetch: suggestions table with newest first sorting
+      // Task 3: UI Rework - Display with newest first (Sort by created_at descending)
       const { data, error } = await supabase
         .from("suggestions")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Supabase Suggestions Fetch Error:", error.message, error.details);
+        console.error("Supabase Suggestions Fetch Error (Check RLS):", error.message, error.details);
         throw error;
       }
       setSuggestions(data || []);
+      console.log("Suggestions Fetch Complete:", data?.length || 0, "rows found.");
     } catch (error) {
       console.error("Error in fetchSuggestions:", error);
     } finally {
@@ -41,7 +42,7 @@ const SuggestionTable: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      // Logic: Delete specific suggestion by ID
+      // Task 3: Delete call (supabase.from('suggestions').delete().eq('id', id))
       const { error } = await supabase
         .from("suggestions")
         .delete()
@@ -52,9 +53,9 @@ const SuggestionTable: React.FC = () => {
         throw error;
       }
       
-      // Feature: Refresh the list immediately after a successful delete
+      // Task 3: Refresh the list immediately after delete
       await fetchSuggestions();
-      toast({ title: "Deleted", description: "Suggestion removed and list updated." });
+      toast({ title: "Deleted", description: "Suggestion removed and feed updated." });
     } catch (error) {
       toast({ title: "Error", description: "Failed to delete suggestion.", variant: "destructive" });
     }
