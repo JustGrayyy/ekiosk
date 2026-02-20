@@ -40,6 +40,7 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           
+          // Data format for PieChart: [{ name: 'Happy', value: 10 }, { name: 'Proud', value: 15 }]
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
@@ -49,18 +50,14 @@ const AdminAnalytics: React.FC = () => {
 
         if (triviaRes.data) {
           const total = triviaRes.data.length;
-          if (total > 0) {
-            const correct = triviaRes.data.filter((t: any) => t.is_correct === true).length;
-            const incorrect = total - correct;
-            
-            // Format for pie chart: [{ name: 'Correct', value: 10 }, { name: 'Incorrect', value: 5 }]
-            setTriviaData([
-              { name: "Correct", value: correct },
-              { name: "Incorrect", value: incorrect }
-            ]);
-          } else {
-            setTriviaData([]);
-          }
+          const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
+          const incorrectCount = total - correctCount;
+          
+          // Data format for success rate chart
+          setTriviaData([
+            { name: "Correct", value: correctCount },
+            { name: "Incorrect", value: incorrectCount }
+          ]);
         }
       } catch (err: any) {
         console.error("Error fetching admin data:", err);
