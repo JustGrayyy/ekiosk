@@ -57,8 +57,12 @@ interface PostDepositModalProps {
 }
 
 export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onClose }) => {
-  const [type] = useState(() => Math.random() < 0.5 ? "trivia" : "sentiment");
-  const [trivia] = useState(() => TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)]);
+  // Use useMemo to ensure the type and trivia are calculated only once on mount
+  const { type, trivia } = React.useMemo(() => ({
+    type: Math.random() < 0.5 ? "trivia" : "sentiment",
+    trivia: TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)]
+  }), []);
+
   const [timeLeft, setTimeLeft] = useState(5);
   const [answered, setAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);

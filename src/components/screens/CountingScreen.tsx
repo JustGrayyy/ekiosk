@@ -21,6 +21,14 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
   const [lastScanTime, setLastScanTime] = useState(0);
   const [showPostModal, setShowPostModal] = useState(false);
 
+  const handleDoneClick = () => {
+    if (count > 0) {
+      setShowPostModal(true);
+    } else {
+      onDone(count);
+    }
+  };
+
   useEffect(() => {
     if (hiddenInputRef.current) {
       hiddenInputRef.current.focus();
@@ -185,7 +193,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
       </motion.div>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.3 }}>
-        <KioskButton onClick={() => count > 0 ? setShowPostModal(true) : onDone(count)} size="medium" className={count > 0 ? "animate-pulse-glow" : ""}>
+        <KioskButton onClick={handleDoneClick} size="medium" className={count > 0 ? "animate-pulse-glow" : ""}>
           DONE
         </KioskButton>
       </motion.div>

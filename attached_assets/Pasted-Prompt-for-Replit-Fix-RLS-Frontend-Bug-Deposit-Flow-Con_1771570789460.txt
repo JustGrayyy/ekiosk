@@ -1,0 +1,32 @@
+Prompt for Replit: Fix RLS Frontend Bug & Deposit Flow
+Context:
+I am experiencing two issues in my application:
+
+The Suggestion box is throwing an RLS (Row Level Security) error when submitting, even though my database policies allow anon inserts.
+
+The 50/50 Interactive Modal (Eco-Trivia / Eco-Sentiment) is not appearing after a successful deposit.
+
+Task 1: Fix the Suggestion Insert (The .select() Bug)
+
+Locate the function that handles submitting a suggestion to Supabase.
+
+The Fix: Ensure the Supabase query does NOT chain .select() or .single() at the end of the .insert() method. My database allows anonymous users to INSERT but restricts them from SELECTing. If you ask it to return the inserted row, it will throw an RLS error.
+
+Correct Syntax Example: await supabase.from('suggestions').insert({ message: suggestionText }) (Notice there is no .select() at the end).
+
+Verify: Ensure it is pointing to the plural table suggestions and the column message.
+
+Task 2: Fix the Post-Deposit Interactive Flow
+
+Locate the main function that handles a successful deposit/scan (where points are added to the student).
+
+The Issue: The UI is likely resetting, closing the modal, or redirecting before the post-deposit interactive screen has a chance to render.
+
+The Fix: 1. Introduce a new state variable: const [showPostDepositAction, setShowPostDepositAction] = useState(false);
+2. When the deposit Supabase call is isSuccess, do not reset the form or redirect yet. Instead, set setShowPostDepositAction(true).
+3. Conditionally render the PostDepositModal (which houses the 50/50 Trivia/Sentiment logic) when this state is true.
+4. Only reset the main deposit screen or redirect the user after the PostDepositModal's onClose or onComplete callback is triggered.
+
+Task 3: Ensure Clean State Management
+
+Please review the PostDepositModal component to make sure the 50/50 logic (Math.random() < 0.5) is evaluated only once when the modal opens, using a useEffect or by calculating it before passing it as a prop, to prevent it from rapidly switching between Trivia and Sentiment if the component re-renders.

@@ -19,17 +19,16 @@ export const SuggestionBox: React.FC<SuggestionBoxProps> = () => {
     setIsSubmitting(true);
     try {
       console.log("Submitting suggestion:", message.trim());
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("suggestions" as any)
-        .insert([{ message: message.trim() }])
-        .select();
+        .insert([{ message: message.trim() }]);
 
       if (error) {
         console.error("Supabase suggestion error:", error.message, error.details, error.hint);
         throw error;
       }
 
-      console.log("Suggestion submitted successfully:", data);
+      console.log("Suggestion submitted successfully");
       toast({
         title: "Thank you!",
         description: "Your suggestion has been submitted successfully.",
