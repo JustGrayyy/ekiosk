@@ -21,36 +21,48 @@ const AdminAnalytics: React.FC = () => {
         setLoading(true);
         console.log("Fetching Admin Data...");
         const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
-          supabase.from("sentiment_logs" as any).select("*"),
-          supabase.from("trivia_logs" as any).select("*"),
-          supabase.from("suggestions" as any).select("*")
+          supabase.from("sentiment_logs").select("*"),
+          supabase.from("trivia_logs").select("*"),
+          supabase.from("suggestions").select("*")
         ]);
 
-        console.log("Sentiment count:", sentimentRes.data?.length);
-        console.log("Trivia count:", triviaRes.data?.length);
-        console.log("Suggestions count:", suggestionsRes.data?.length);
+        console.log("Sentiment data:", sentimentRes.data);
+        console.log("Trivia data:", triviaRes.data);
+        console.log("Suggestions data:", suggestionsRes.data);
 
         if (sentimentRes.error) throw new Error(`Sentiment Error: ${sentimentRes.error.message}`);
         if (triviaRes.error) throw new Error(`Trivia Error: ${triviaRes.error.message}`);
         if (suggestionsRes.error) throw new Error(`Suggestions Error: ${suggestionsRes.error.message}`);
 
         if (sentimentRes.data) {
+          const expectedFeelings = ['Happy', 'Proud', 'Neutral'];
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
-            const feeling = curr.feeling || "Unknown";
-            acc[feeling] = (acc[feeling] || 0) + 1;
+            const feeling = curr.feeling;
+            if (expectedFeelings.includes(feeling)) {
+              acc[feeling] = (acc[feeling] || 0) + 1;
+            }
             return acc;
           }, {});
-          const formatted = Object.entries(counts).map(([name, value]) => ({ name, value }));
+          
+          const formatted = expectedFeelings.map(name => ({
+            name,
+            value: counts[name] || 0
+          }));
           setSentimentData(formatted);
         }
 
         if (triviaRes.data) {
-          const correct = triviaRes.data.filter((t: any) => t.is_correct).length;
-          const incorrect = triviaRes.data.length - correct;
-          setTriviaData(triviaRes.data.length > 0 ? [
-            { name: "Correct", value: correct },
-            { name: "Incorrect", value: incorrect }
-          ] : []);
+          const total = triviaRes.data.length;
+          if (total > 0) {
+            const correct = triviaRes.data.filter((t: any) => t.is_correct === true).length;
+            const incorrect = total - correct;
+            setTriviaData([
+              { name: "Correct", value: correct },
+              { name: "Incorrect", value: incorrect }
+            ]);
+          } else {
+            setTriviaData([]);
+          }
         }
       } catch (err: any) {
         console.error("Error fetching admin data:", err);

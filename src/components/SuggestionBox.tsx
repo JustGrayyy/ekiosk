@@ -20,7 +20,7 @@ export const SuggestionBox: React.FC<SuggestionBoxProps> = () => {
     try {
       console.log("Submitting suggestion:", message.trim());
       const { error } = await supabase
-        .from("suggestions" as any)
+        .from("suggestions")
         .insert([{ message: message.trim() }]);
 
       if (error) {
