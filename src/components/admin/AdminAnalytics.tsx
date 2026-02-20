@@ -26,10 +26,6 @@ const AdminAnalytics: React.FC = () => {
           supabase.from("suggestions").select("*")
         ]);
 
-        console.log("Sentiment data:", sentimentRes.data);
-        console.log("Trivia data:", triviaRes.data);
-        console.log("Suggestions data:", suggestionsRes.data);
-
         if (sentimentRes.error) throw new Error(`Sentiment Error: ${sentimentRes.error.message}`);
         if (triviaRes.error) throw new Error(`Trivia Error: ${triviaRes.error.message}`);
         if (suggestionsRes.error) throw new Error(`Suggestions Error: ${suggestionsRes.error.message}`);
@@ -56,6 +52,8 @@ const AdminAnalytics: React.FC = () => {
           if (total > 0) {
             const correct = triviaRes.data.filter((t: any) => t.is_correct === true).length;
             const incorrect = total - correct;
+            
+            // Format for pie chart: [{ name: 'Correct', value: 10 }, { name: 'Incorrect', value: 5 }]
             setTriviaData([
               { name: "Correct", value: correct },
               { name: "Incorrect", value: incorrect }

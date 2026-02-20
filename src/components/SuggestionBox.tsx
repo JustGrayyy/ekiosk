@@ -19,6 +19,7 @@ export const SuggestionBox: React.FC<SuggestionBoxProps> = () => {
     setIsSubmitting(true);
     try {
       console.log("Submitting suggestion:", message.trim());
+      // Explicitly check for plural 'suggestions'
       const { error } = await supabase
         .from("suggestions")
         .insert([{ message: message.trim() }]);

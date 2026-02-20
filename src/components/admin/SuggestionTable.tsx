@@ -16,12 +16,18 @@ const SuggestionTable: React.FC = () => {
 
   const fetchSuggestions = async () => {
     try {
+      setLoading(true);
+      // Ensure we are fetching from 'suggestions' and ordering by 'created_at'
       const { data, error } = await supabase
         .from("suggestions")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error fetching suggestions:", error);
+        throw error;
+      }
+      console.log("Fetched suggestions:", data);
       setSuggestions(data || []);
     } catch (error) {
       console.error("Error fetching suggestions:", error);
