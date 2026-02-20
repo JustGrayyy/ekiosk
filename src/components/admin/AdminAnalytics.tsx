@@ -17,10 +17,17 @@ const AdminAnalytics: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [sentimentRes, triviaRes] = await Promise.all([
-          supabase.from("sentiment_logs" as any).select("feeling"),
-          supabase.from("trivia_logs" as any).select("is_correct")
+        setLoading(true);
+        console.log("Fetching analytics data...");
+        const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
+          supabase.from("sentiment_logs" as any).select("*"),
+          supabase.from("trivia_logs" as any).select("*"),
+          supabase.from("suggestions" as any).select("*")
         ]);
+
+        console.log("Sentiment count:", sentimentRes.data?.length);
+        console.log("Trivia count:", triviaRes.data?.length);
+        console.log("Suggestions count:", suggestionsRes.data?.length);
 
         if (sentimentRes.data) {
           const counts = sentimentRes.data.reduce((acc: any, curr: any) => {
@@ -28,7 +35,7 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           const formatted = Object.entries(counts).map(([name, value]) => ({ name, value }));
-          setSentimentData(formatted.length > 0 ? formatted : [{ name: "No Data", value: 1 }]);
+          setSentimentData(formatted.length > 0 ? formatted : []);
         }
 
         if (triviaRes.data) {
@@ -37,7 +44,7 @@ const AdminAnalytics: React.FC = () => {
           setTriviaData(triviaRes.data.length > 0 ? [
             { name: "Correct", value: correct },
             { name: "Incorrect", value: incorrect }
-          ] : [{ name: "No Data", value: 1 }]);
+          ] : []);
         }
       } catch (err) {
         console.error("Error fetching analytics:", err);

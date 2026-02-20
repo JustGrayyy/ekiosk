@@ -54,34 +54,38 @@ const TRIVIA_QUESTIONS = [
 interface PostDepositModalProps {
   userLrn: string;
   onClose: () => void;
+  currentPoints: number;
 }
 
-export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onClose }) => {
+export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onClose, currentPoints }) => {
   // Use useMemo to ensure the type and trivia are calculated only once on mount
   const { type, trivia } = React.useMemo(() => ({
     type: Math.random() < 0.5 ? "trivia" : "sentiment",
     trivia: TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)]
   }), []);
 
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [answered, setAnswered] = useState(false);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [resultState, setResultState] = useState<'playing' | 'correct' | 'incorrect'>('playing');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (type === "trivia" && !answered && timeLeft > 0) {
+    if (type === "trivia" && resultState === 'playing' && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
       return () => clearInterval(timer);
-    } else if (type === "trivia" && timeLeft === 0 && !answered) {
+    } else if (type === "trivia" && timeLeft === 0 && resultState === 'playing') {
       handleTriviaAnswer(null);
     }
-  }, [type, timeLeft, answered]);
+  }, [type, timeLeft, resultState]);
 
   const handleSentiment = async (feeling: string) => {
     setIsSubmitting(true);
     try {
       const { error } = await supabase.from("sentiment_logs" as any).insert([{ feeling }]);
-      if (error) throw error;
+      if (error) {
+        console.error("Sentiment insert error:", error.message);
+        throw error;
+      }
       playSuccessSound();
       toast({ title: "Thanks for sharing!", description: "Every action counts." });
       onClose();
@@ -95,30 +99,40 @@ export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onC
     if (answered) return;
     setAnswered(true);
     const correct = selected === trivia.correctAnswer;
-    setIsCorrect(correct);
+    setResultState(correct ? 'correct' : 'incorrect');
     setIsSubmitting(true);
 
     try {
-      await supabase.from("trivia_logs" as any).insert([{
+      // Task 2: Fix trivia_logs insertion (no .select() or .single())
+      const { error: insertError } = await supabase.from("trivia_logs" as any).insert([{
         question_id: trivia.id,
         is_correct: correct
       }]);
+      
+      if (insertError) {
+        console.error("Trivia log insert error:", insertError.message);
+      }
 
       if (correct) {
-        await supabase.rpc("increment_points", {
-          student_lrn: userLrn,
-          student_name: "",
-          points_to_add: 1,
-          student_section: null
-        } as any);
+        // Task 5: Update student points balance
+        const { error: updateError } = await supabase
+          .from('student_points')
+          .update({ points_balance: currentPoints + 1 })
+          .eq('lrn', userLrn);
+          
+        if (updateError) {
+          console.error("Points update error:", updateError.message);
+        }
+        
         playSuccessSound();
       } else {
         playErrorSound();
       }
 
+      // Keep result visible for 3 seconds then close
       setTimeout(onClose, 3000);
     } catch (err: any) {
-      console.error("Trivia error:", err.message);
+      console.error("Trivia workflow error:", err.message);
       setTimeout(onClose, 3000);
     }
   };
@@ -184,7 +198,7 @@ export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onC
                     answered
                       ? option === trivia.correctAnswer
                         ? "border-green-500 bg-green-500/10 text-green-500"
-                        : option === (answered && !isCorrect && option === trivia.correctAnswer ? trivia.correctAnswer : "") 
+                        : option === (resultState === 'incorrect' && option === trivia.correctAnswer ? trivia.correctAnswer : "") 
                           ? "" 
                           : "border-primary/10 opacity-50"
                       : "border-primary/20 hover:border-primary hover:bg-primary/5 text-foreground"
@@ -201,13 +215,13 @@ export const PostDepositModal: React.FC<PostDepositModalProps> = ({ userLrn, onC
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
-                  className={`p-4 rounded-xl border-2 ${isCorrect ? "border-green-500/30 bg-green-500/5" : "border-yellow-500/30 bg-yellow-500/5"}`}
+                  className={`p-4 rounded-xl border-2 ${resultState === 'correct' ? "border-green-500/30 bg-green-500/5" : "border-red-500/30 bg-red-500/5"}`}
                 >
                   <div className="flex gap-3">
-                    {isCorrect ? <Trophy className="w-6 h-6 text-green-500" /> : <AlertCircle className="w-6 h-6 text-yellow-500" />}
+                    {resultState === 'correct' ? <Trophy className="w-6 h-6 text-green-500" /> : <XCircle className="w-6 h-6 text-red-500" />}
                     <div>
-                      <p className={`font-bold ${isCorrect ? "text-green-500" : "text-yellow-500"}`}>
-                        {isCorrect ? "CORRECT! +1 BONUS POINT" : "NICE TRY!"}
+                      <p className={`font-bold ${resultState === 'correct' ? "text-green-500" : "text-red-500"}`}>
+                        {resultState === 'correct' ? "CORRECT! +1 BONUS POINT" : `Oops! That's incorrect. The correct answer was: ${trivia.correctAnswer}`}
                       </p>
                       <p className="text-sm text-foreground/80 mt-1">{trivia.explanation}</p>
                     </div>

@@ -1,0 +1,47 @@
+Feature Fix Batch: Admin Dashboard Sync & Trivia Logic Overhaul
+
+Context:
+
+I have 5 critical bugs regarding the Admin Dashboard data and the Eco-Trivia workflow. Please fix them by updating the relevant React components and Supabase queries.
+
+Task 1: Fix Admin Dashboard Data Fetching
+
+
+
+The Issue: Data exists in my Supabase tables (suggestions, trivia_logs, sentiment_logs), but the Admin Dashboard charts and tables are empty.
+
+The Fix: Review the Admin Dashboard component. Ensure you are using supabase.from('tableName').select('*') for all three tables inside a useEffect or data-fetching hook. Map this fetched data properly to the Recharts (Pie/Donut charts) and the Suggestions list. Ensure there are no silent errors in the fetch functions.
+
+Task 2: Fix trivia_logs Database Insertion
+
+
+
+The Issue: The trivia results are not saving to the database.
+
+The Fix: In the EcoTrivia component, when an answer is clicked or time runs out, execute: await supabase.from('trivia_logs').insert({ is_correct: true/false }). Crucial: Do not chain .select() or .single() at the end of this insert, as my RLS policies prevent anonymous users from reading data. Catch and console.error any errors.
+
+Task 3 & 4: Trivia UI Flow & 10-Second Timer
+
+
+
+The Timer: Change the trivia countdown timer state from 5 seconds to 10 seconds.
+
+The UI Bug: Currently, getting the answer wrong or letting the timer run out results in a blank green screen.
+
+The Fix: Introduce a resultState (e.g., 'playing' | 'correct' | 'incorrect').
+
+If the user clicks the wrong answer or the timer hits 0, set the state to 'incorrect'.
+
+Create a UI view for 'incorrect' that clearly says: "Oops! That's incorrect. The correct answer was: [Insert Correct Answer]."
+
+Keep this "Result Screen" (whether correct or incorrect) visible for 3 seconds, and then show the deposit confirmation then back to the start
+
+Task 5: The Missing Bonus Point Update
+
+
+
+The Issue: When a student gets the trivia right, the +1 bonus point is not being added to their actual balance in the database.
+
+The Fix: In the "Correct Answer" logic block, before showing the success screen, run a Supabase UPDATE query on the student_points table to add 1 to their current balance.
+
+Logic Note: You will need to pass the student's identifier (e.g., lrn or student_id) and their current_points down into the EcoTrivia modal as props so you can run: await supabase.from('student_points').update({ points: currentPoints + 1 }).eq('lrn', studentLrn).

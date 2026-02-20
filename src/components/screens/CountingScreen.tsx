@@ -15,11 +15,25 @@ interface CountingScreenProps {
 
 const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScreenProps) => {
   const [count, setCount] = useState(0);
+  const [pointsBalance, setPointsBalance] = useState(0);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const scanningRef = useRef(false);
   const [lastScannedCode, setLastScannedCode] = useState<string | null>(null);
   const [lastScanTime, setLastScanTime] = useState(0);
   const [showPostModal, setShowPostModal] = useState(false);
+
+  useEffect(() => {
+    // Fetch initial points balance
+    const fetchPoints = async () => {
+      const { data, error } = await supabase
+        .from('student_points')
+        .select('points_balance')
+        .eq('lrn', userLrn)
+        .maybeSingle();
+      if (data) setPointsBalance(data.points_balance || 0);
+    };
+    fetchPoints();
+  }, [userLrn]);
 
   const handleDoneClick = () => {
     if (count > 0) {
@@ -129,6 +143,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         // Valid bottle
         playSuccessSound();
         setCount((prev) => prev + 1);
+        setPointsBalance((prev) => prev + 1);
         toast({ title: "Accepted", description: `${p.name} (+1 Point)` });
         syncPointToDatabase();
         supabase
@@ -202,6 +217,7 @@ const CountingScreen = ({ onDone, userLrn, userName, userSection }: CountingScre
         {showPostModal && (
           <PostDepositModal
             userLrn={userLrn}
+            currentPoints={pointsBalance}
             onClose={() => onDone(count)}
           />
         )}
