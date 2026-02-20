@@ -19,7 +19,7 @@ const AdminAnalytics: React.FC = () => {
     const fetchAllAnalytics = async () => {
       try {
         setLoading(true);
-        console.log("Starting Master Rework: Fetching Centralized Analytics Data...");
+        console.log("Master Rework: Fetching Centralized Analytics Data...");
         
         // Task 1: Complete Rework of Data Fetching (Centralized Fetch)
         const [sentimentRes, triviaRes, suggestionsRes] = await Promise.all([
@@ -28,17 +28,17 @@ const AdminAnalytics: React.FC = () => {
           supabase.from("suggestions").select("*")
         ]);
 
-        // Task 1: Error Reporting (Crucial for RLS debugging)
+        // Task 1: Error Reporting (RLS/Policy Debugging)
         if (sentimentRes.error) {
-          console.error("Supabase Sentiment Fetch Error (Check RLS):", sentimentRes.error.message, sentimentRes.error.details);
+          console.error("Supabase Sentiment Fetch Error:", sentimentRes.error.message);
           throw new Error(`Sentiment: ${sentimentRes.error.message}`);
         }
         if (triviaRes.error) {
-          console.error("Supabase Trivia Fetch Error (Check RLS):", triviaRes.error.message, triviaRes.error.details);
+          console.error("Supabase Trivia Fetch Error:", triviaRes.error.message);
           throw new Error(`Trivia: ${triviaRes.error.message}`);
         }
         if (suggestionsRes.error) {
-          console.error("Supabase Suggestions Fetch Error (Check RLS):", suggestionsRes.error.message, suggestionsRes.error.details);
+          console.error("Supabase Suggestions Fetch Error:", suggestionsRes.error.message);
           throw new Error(`Suggestions: ${suggestionsRes.error.message}`);
         }
 
@@ -53,35 +53,29 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           
-          // Output Format for Recharts: [{ name: 'Happy', value: 10 }, { name: 'Proud', value: 5 }, { name: 'Neutral', value: 2 }]
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
           }));
           setSentimentData(formatted);
-          console.log("Sentiment Transformation Complete:", formatted);
         }
 
         // Task 2: Data Transformation for Trivia Chart (Success vs. Failure)
         if (triviaRes.data) {
           const total = triviaRes.data.length;
-          // Logic: Count total rows where is_correct is true vs. false
           const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
           const incorrectCount = total - correctCount;
           
-          // Output Format: [{ name: 'Correct', value: 25 }, { name: 'Incorrect', value: 10 }]
-          const triviaFormatted = [
+          setTriviaData([
             { name: "Correct", value: correctCount },
             { name: "Incorrect", value: incorrectCount }
-          ];
-          setTriviaData(triviaFormatted);
-          console.log("Trivia Transformation Complete:", triviaFormatted);
+          ]);
         }
       } catch (err: any) {
         console.error("Critical Admin Analytics Error:", err);
         toast({
-          title: "Dashboard Fetch Failed",
-          description: "Verify your RLS policies or database connection in the console.",
+          title: "Dashboard Sync Failed",
+          description: "Check console for RLS policy errors or connection issues.",
           variant: "destructive"
         });
       } finally {
