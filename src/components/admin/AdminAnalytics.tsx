@@ -40,7 +40,7 @@ const AdminAnalytics: React.FC = () => {
             return acc;
           }, {});
           
-          // Count total number of 'Happy', 'Proud', and 'Neutral' responses
+          // Count total number of 'Happy', 'Proud', and 'Neutral' responses for the sentiment pie chart
           const formatted = expectedFeelings.map(name => ({
             name,
             value: counts[name] || 0
@@ -50,7 +50,7 @@ const AdminAnalytics: React.FC = () => {
 
         if (triviaRes.data) {
           const total = triviaRes.data.length;
-          // Calculate the percentage of is_correct === true vs false
+          // Calculate the percentage of is_correct === true vs false for the trivia success rate chart
           const correctCount = triviaRes.data.filter((t: any) => t.is_correct === true).length;
           const incorrectCount = total - correctCount;
           
